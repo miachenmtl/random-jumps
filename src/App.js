@@ -1,12 +1,10 @@
-import './App.css';
-
 import Main from './container/Main';
 
 function App() {
   return (
-    <div className="App">
+    <div className="app">
       <header>
-        Random Jumps
+        <h1>Random Knight Jumps</h1>
       </header>
       <Main />
     </div>

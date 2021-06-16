@@ -3,6 +3,6 @@ import App from './App';
 
 test('renders app title', () => {
   render(<App />);
-  const titleEl = screen.getByText(/Random Jumps/i);
+  const titleEl = screen.getByText(/Random Knight Jumps/i);
   expect(titleEl).toBeInTheDocument();
 });
