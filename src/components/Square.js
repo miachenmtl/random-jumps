@@ -1,9 +1,6 @@
-const Square = ({ visitCount, squareName, isDark, isCurrent }) => (
+const Square = ({ visitCount, squareName, isCurrent }) => (
   <td
-    style={{
-      backgroundColor: isDark ? 'blue' : 'antiquewhite',
-      color: isCurrent ? 'red' : 'lightseagreen'
-    }}
+    className={isCurrent ? 'current' : undefined}
     title={squareName}
   >{visitCount}</td>
 );

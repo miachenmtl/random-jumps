@@ -3,3 +3,22 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
+
+const observe = jest.fn();
+const unobserve = jest.fn();
+const disconnect = jest.fn();
+
+class MockResizeObserver {
+  constructor(callback) {
+    this.callback = callback;
+    this.observe = observe;
+    this.unobserve = unobserve;
+    this.disconnect = disconnect;
+  }
+}
+
+global.resizeObserverMethods = {
+  observe, unobserve, disconnect
+}
+
+global.ResizeObserver = MockResizeObserver;
