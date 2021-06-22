@@ -28,10 +28,16 @@ code {
   text-align: center;
 }
 
-.board-wrapper {
+.wrapper {
   position: relative;
   display: inline-block;
   margin: 20px auto;
+  vertical-align: middle;
+}
+
+.board-wrapper {
+  display: inline-block;
+  border: 3px solid grey;
 }
 
 table {
@@ -40,17 +46,18 @@ table {
   table-layout: fixed;
   border-collapse: collapse;
   border-spacing: 0;
-  border: 3px solid grey;
+  margin: 0;
 }
 
 td {
-  padding: 4px;
+  padding: 4px !important; /* milligram removes right padding from last cell */
   text-align: right;
   vertical-align: bottom;
   font-size: 1.5em;
   color: black;
   filter: brightness(1);
   transition: all 0.2s;
+  border: none;
 }
 
 td.current {
@@ -74,4 +81,19 @@ div.piece {
   justify-content: center;
   align-items: center;
   opacity: 0.8
+}
+
+.panel {
+  margin-left: 30px;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  width: 160px;
+  padding: 10px;
+  text-align: center;
+}
+
+.panel button {
+  display: block;
+  width: 100%;
 }
