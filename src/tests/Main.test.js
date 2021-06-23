@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 
 import Main from '../container/Main';
 
@@ -50,5 +50,50 @@ describe('The Main container', () => {
     expect(global.resizeObserverMethods.disconnect).not.toHaveBeenCalled();
     unmount();
     expect(global.resizeObserverMethods.disconnect).toHaveBeenCalled();
+  });
+
+  it('makes random moves and updates visit counts when the user presses the start button', () => {
+    jest.useFakeTimers();
+    const startButton = screen.getByText('Start');
+    expect(startButton).toBeInTheDocument();
+    expect(global.setInterval).not.toHaveBeenCalled();
+    fireEvent.click(startButton);
+    expect(global.setInterval).toHaveBeenCalled();
+    expect(screen.getAllByText('1')).toHaveLength(1);
+    // default interval is 500 ms
+    jest.advanceTimersByTime(600);
+    expect(screen.getAllByText('1')).toHaveLength(2);
+    jest.advanceTimersByTime(500);
+    const totalOneCounts = screen.getAllByText('1').length;
+    const totalTwoCounts = screen.queryAllByText('2').length;
+    expect(totalOneCounts + 2 * totalTwoCounts).toBe(3);
+    jest.clearAllTimers();
+  });
+
+  it('stops moving and updating visit counts when the user presses stop after starting', () => {
+    jest.useFakeTimers();
+    const startButton = screen.getByText('Start');
+    fireEvent.click(startButton);
+    jest.advanceTimersByTime(600);
+    expect(screen.getAllByText('1')).toHaveLength(2);
+    const stopButton = screen.getByText('Stop');
+    fireEvent.click(stopButton);
+    jest.advanceTimersByTime(500);
+    expect(screen.getAllByText('1')).toHaveLength(2);
+    jest.clearAllTimers();
+  });
+
+  it('resets the visit counts and stops moving when the user presses reset', () => {
+    jest.useFakeTimers();
+    const startButton = screen.getByText('Start');
+    fireEvent.click(startButton);
+    jest.advanceTimersByTime(600);
+    expect(screen.getAllByText('1')).toHaveLength(2);
+    const resetButton = screen.getByText('Reset');
+    fireEvent.click(resetButton);
+    expect(screen.getAllByText('1')).toHaveLength(1);
+    jest.advanceTimersByTime(500);
+    expect(screen.getAllByText('1')).toHaveLength(1);
+    jest.clearAllTimers();
   });
 });

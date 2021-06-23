@@ -4,50 +4,35 @@ import Board from '../components/Board'
 import Rank from '../components/Rank';
 import Square from '../components/Square';
 import Knight from '../components/Knight';
+import { getSquareName, getLegalMoves, getRankName, getFileName } from './utils';
 
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
-const getRankName = rankIndex => (rankIndex + 1).toString();
-const getFileName = fileIndex => ALPHABET[fileIndex];
-const getSquareName = ({ fileIndex, rankIndex }) =>
-  getFileName(fileIndex) + getRankName(rankIndex);
+import Panel from './Panel';
 
-/*
-const parseSquareName = (squareName) => ({
-  fileIndex: ALPHABET.findIndex(squareName[0]),
-  rankIndex: parseInt(squareName[1], 10) - 1
-});
-*/
 
 class Main extends Component {
   constructor() {
     super();
 
-    const totalRanks = 8;
     const totalFiles = 8;
-
+    const totalRanks = 8;
     const visitCounts = Array(totalRanks).fill(0).map(
       () => Array(totalFiles).fill(0)
     );
     visitCounts[0][0] = 1;
 
-    const [currentRankIndex, currentFileIndex] = [0, 0];
-    const squareWidth = 0;
-
-    const isResizing = false;
-    const timeoutId = null;
-
     this.boardEl = null;
 
-
     this.state = {
-      totalRanks,
-      totalFiles,
-      visitCounts,
-      currentRankIndex,
-      currentFileIndex,
-      squareWidth,
-      isResizing,
-      timeoutId
+      totalRanks: totalRanks,
+      totalFiles: totalFiles,
+      totalRandomMoves: 1,
+      visitCounts: visitCounts,
+      currentRankIndex: 0,
+      currentFileIndex: 0,
+      squareWidth: 0,
+      isResizing: false,
+      isMoving: false,
+      timeoutId: null
     };
   }
 
@@ -99,22 +84,51 @@ class Main extends Component {
     rankIndex: this.state.currentRankIndex
   });
 
+  checkIfLegal = (fileIndex, rankIndex) => {
+    const hasLegalFile = (0 <= fileIndex) && (fileIndex <= this.state.totalFiles - 1);
+    const hasLegalRank = (0 <= rankIndex) && (rankIndex <= this.state.totalRanks - 1);
+    return hasLegalFile && hasLegalRank;
+  }
 
-  getLegalMoves = () => {}
-  moveKnight = (newRankIndex, newFileIndex) => {
+  // state-changing methods
+  moveKnight = (newFileIndex, newRankIndex) => {
+    const newVisitCounts = this.state.visitCounts.map(
+      (rank, i) => rank.map(
+        (visitCount, j) => 
+          visitCount + Number((i === newRankIndex) && (j === newFileIndex))
+      )
+    )
     this.setState({
+      currentFileIndex: newFileIndex,
       currentRankIndex: newRankIndex,
-      currentFileIndex: newFileIndex
+      visitCounts: newVisitCounts
     });
   }
-  resetBoard = () => {}
+
+  makeRandomMove = () => {
+    const { currentFileIndex, currentRankIndex, totalRandomMoves } = this.state;
+    const possibleMoves = getLegalMoves(currentFileIndex, currentRankIndex, this.checkIfLegal);
+    const nextMoveIndex = Math.floor(Math.random() * possibleMoves.length);
+    this.moveKnight(...possibleMoves[nextMoveIndex]);
+    this.setState({ totalRandomMoves: totalRandomMoves + 1 });
+  }
+  resetBoard = () => {
+    const visitCounts = Array(this.state.totalRanks).fill(0).map(
+      () => Array(this.state.totalFiles).fill(0)
+    );
+    visitCounts[0][0] = 1;
+    const [currentRankIndex, currentFileIndex] = [0, 0];
+    this.setState({
+      visitCounts, currentFileIndex, currentRankIndex
+    })
+  }
   changeDimensions = () => {}
 
   render() {
     return (
       <main>
-        <div className="board-wrapper" ref={this.boardRefCallback}>
-          <Board>
+        <div className="wrapper">
+          <Board refCallback={this.boardRefCallback}>
             {
               this.state.visitCounts.reverse().map((rankVisits, visualRankIndex) => {
                 const logicalRankIndex = this.reverseRankIndex(visualRankIndex);
@@ -144,8 +158,13 @@ class Main extends Component {
             fileIndex={this.state.currentFileIndex}
             isResizing={this.state.isResizing}
           />
+          <Panel
+            makeRandomMove={this.makeRandomMove}
+            resetBoard={this.resetBoard}
+            setIsMoving={(newIsMoving) => { this.setState({ isMoving: newIsMoving }); }}
+            isMoving={this.state.isMoving}
+          />
         </div>
-        {/* UI */}
       </main>
     );
   }
