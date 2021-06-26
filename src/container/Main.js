@@ -8,6 +8,13 @@ import { getSquareName, getLegalMoves, getRankName, getFileName } from './utils'
 
 import Panel from './Panel';
 
+const SPEED_MAP = new Map([
+  ['Walk', 500],
+  ['Trot', 250],
+  ['Gallop', 100],
+  ['Jet', 10],
+  ['Warp', 1]
+]);
 
 class Main extends Component {
   constructor() {
@@ -30,6 +37,13 @@ class Main extends Component {
       currentRankIndex: 0,
       currentFileIndex: 0,
       squareWidth: 0,
+      speedIndex: 0,
+      displaySettings: {
+        showKnight: true,
+        showCounts: true,
+        showPercentage: false,
+        showHeatmap: false
+      },
       isResizing: false,
       isMoving: false,
       timeoutId: null
@@ -91,27 +105,56 @@ class Main extends Component {
   }
 
   // state-changing methods
-  moveKnight = (newFileIndex, newRankIndex) => {
+  moveKnight = (newMoves) => {
+    const newSquareNames = newMoves.map(indices => getSquareName(...indices));
     const newVisitCounts = this.state.visitCounts.map(
-      (rank, i) => rank.map(
-        (visitCount, j) => 
-          visitCount + Number((i === newRankIndex) && (j === newFileIndex))
+      (rank, rankIndex) => rank.map(
+        (visitCount, fileIndex) =>
+          visitCount + newSquareNames.filter(
+            squareName => squareName === getSquareName(fileIndex, rankIndex)
+          ).length
       )
-    )
+    );
+    const lastMove = newMoves.slice(-1);
+
     this.setState({
-      currentFileIndex: newFileIndex,
-      currentRankIndex: newRankIndex,
+      currentFileIndex: lastMove[0][0],
+      currentRankIndex: lastMove[0][1],
       visitCounts: newVisitCounts
     });
   }
 
-  makeRandomMove = () => {
+  makeRandomMoves = (totalNewMoves = 1) => {
     const { currentFileIndex, currentRankIndex, totalRandomMoves } = this.state;
-    const possibleMoves = getLegalMoves(currentFileIndex, currentRankIndex, this.checkIfLegal);
-    const nextMoveIndex = Math.floor(Math.random() * possibleMoves.length);
-    this.moveKnight(...possibleMoves[nextMoveIndex]);
-    this.setState({ totalRandomMoves: totalRandomMoves + 1 });
+    let tempFileIndex = currentFileIndex;
+    let tempRankIndex = currentRankIndex;
+    const newMoves = [];
+    for (let i = 0; i < totalNewMoves; i += 1) {
+      const possibleMoves = getLegalMoves(tempFileIndex, tempRankIndex, this.checkIfLegal);
+      const nextMoveIndex = Math.floor(Math.random() * possibleMoves.length);
+      const nextMove = possibleMoves[nextMoveIndex];
+      newMoves.push(nextMove);
+      ([tempFileIndex, tempRankIndex] = nextMove);
+    }
+
+    this.moveKnight(newMoves);
+    this.setState({ totalRandomMoves: totalRandomMoves + totalNewMoves });
   }
+
+  setSpeed = (speedName) => {
+    this.setState({ speedIndex: Array.from(SPEED_MAP.keys()).indexOf(speedName) });
+  }
+
+  toggleDisplaySettings = (settingName) => {
+    const newDisplaySettings = Object.assign(
+      this.state.displaySettings,
+      { [settingName]: !this.state.displaySettings[settingName]}
+    );
+    this.setState({
+      displaySettings: newDisplaySettings
+    });
+  }
+
   resetBoard = () => {
     const visitCounts = Array(this.state.totalRanks).fill(0).map(
       () => Array(this.state.totalFiles).fill(0)
@@ -125,6 +168,10 @@ class Main extends Component {
   changeDimensions = () => {}
 
   render() {
+    // TODO Have single source of truth for MIN_INTERVAL
+    const interval = Array.from(SPEED_MAP.values())[this.state.speedIndex];
+    const displayKnight = this.state.displaySettings.showKnight && (interval >= 100);
+
     return (
       <main>
         <div className="wrapper">
@@ -152,15 +199,25 @@ class Main extends Component {
               })
             }
           </Board>
-          <Knight
-            squareWidth={this.state.squareWidth}
-            visualRankIndex={this.reverseRankIndex(this.state.currentRankIndex)}
-            fileIndex={this.state.currentFileIndex}
-            isResizing={this.state.isResizing}
-          />
+          {
+            displayKnight &&
+              <Knight
+                squareWidth={this.state.squareWidth}
+                visualRankIndex={this.reverseRankIndex(this.state.currentRankIndex)}
+                fileIndex={this.state.currentFileIndex}
+                interval={interval}
+                isResizing={this.state.isResizing}
+              />
+          }
           <Panel
-            makeRandomMove={this.makeRandomMove}
+            makeRandomMoves={this.makeRandomMoves}
             resetBoard={this.resetBoard}
+            interval={interval}
+            speedNames={Array.from(SPEED_MAP.keys())}
+            speedIndex={this.state.speedIndex}
+            setSpeed={this.setSpeed}
+            displaySettings={this.state.displaySettings}
+            toggleDisplaySettings={this.toggleDisplaySettings}
             setIsMoving={(newIsMoving) => { this.setState({ isMoving: newIsMoving }); }}
             isMoving={this.state.isMoving}
           />
