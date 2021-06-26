@@ -1,6 +1,13 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 
 import Main from '../container/Main';
+
+function getTotalCount(element) {
+  const squares = within(element).getAllByText(/^\d+$/);
+  const counts = squares.map(squareEl => parseInt(squareEl.innerHTML, 10));
+  const total = counts.reduce((acc, val) => acc + val);
+  return total;
+};
 
 describe('The Main container', () => {
   beforeEach(() => {
@@ -64,9 +71,9 @@ describe('The Main container', () => {
     jest.advanceTimersByTime(600);
     expect(screen.getAllByText('1')).toHaveLength(2);
     jest.advanceTimersByTime(500);
-    const totalOneCounts = screen.getAllByText('1').length;
-    const totalTwoCounts = screen.queryAllByText('2').length;
-    expect(totalOneCounts + 2 * totalTwoCounts).toBe(3);
+    const board = screen.getByRole('table');
+    const totalCount = getTotalCount(board);
+    expect(totalCount).toBe(3);
     jest.clearAllTimers();
   });
 
@@ -83,6 +90,38 @@ describe('The Main container', () => {
     jest.clearAllTimers();
   });
 
+  it('lets the user change speed while moving', () => {
+    const startButton = screen.getByText('Start');
+    fireEvent.click(startButton);
+    expect(screen.getAllByText('1')).toHaveLength(1);
+    jest.advanceTimersByTime(550);
+    expect(screen.getAllByText('1')).toHaveLength(2);
+    const speedSelect = screen.getByRole('combobox', { name: 'Speed' });
+    fireEvent.change(speedSelect, { target: { value: 'Gallop' } });
+    jest.advanceTimersByTime(650);
+    const totalCount = getTotalCount(screen.getByRole('table'));
+    expect(totalCount).toBe(8);
+    jest.clearAllTimers();
+  });
+
+  it('hides the knight while moving at warp speed', async () => {
+    jest.useFakeTimers();
+    const board = screen.getByRole('table');
+    const startButton = screen.getByText('Start');
+    const speedSelect = screen.getByLabelText('Speed');
+    fireEvent.change(speedSelect, { target: { value: 'Warp' } });
+    fireEvent.click(startButton);
+    await waitFor(() => {
+      expect(screen.queryByAltText('Knight')).toBeNull();
+    });
+    jest.advanceTimersByTime(500);
+    const squares = within(board).getAllByText(/^\d+$/);
+    const counts = squares.map(squareEl => parseInt(squareEl.innerHTML, 10));
+    const total = counts.reduce((acc, val) => acc + val);
+    expect(total).toBe(501);
+    jest.clearAllTimers();
+  });
+
   it('resets the visit counts and stops moving when the user presses reset', () => {
     jest.useFakeTimers();
     const startButton = screen.getByText('Start');
@@ -95,5 +134,17 @@ describe('The Main container', () => {
     jest.advanceTimersByTime(500);
     expect(screen.getAllByText('1')).toHaveLength(1);
     jest.clearAllTimers();
+  });
+
+  it('allows the user to show and hide the knight', async () => {
+    const knight = screen.getByAltText('Knight');
+    expect(knight).toBeVisible();
+    const showKnightCheckbox = screen.getByRole('checkbox', { name: 'Knight' });
+    fireEvent.click(showKnightCheckbox);
+    expect(knight).not.toBeVisible();
+    fireEvent.click(showKnightCheckbox);
+    await waitFor(() => {
+      expect(screen.getByAltText('Knight')).toBeVisible();
+    });
   });
 });
