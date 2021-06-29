@@ -1,4 +1,4 @@
-import Main from './container/Main';
+import Main from './containers/Main';
 
 function App() {
   return (

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import Settings from '../components/Settings';
+import Settings from './Settings';
 
-const MIN_INTERVAL = 100;
+import { MIN_INTERVAL } from '../constants';
 
 const startTimer = (interval, makeRandomMoves, setIntervalId) => {
   const totalNewMoves = Math.max(1, MIN_INTERVAL / interval);
@@ -58,16 +58,6 @@ function Panel({
     setSpeed(value);
     if (isAlreadyMoving) handleStart();
   }
-
-/*
-TODO: change speed
-show/hide knight
-heatmap view
-percent view
-show total moves
-as collapsible settings
-change dimensions
-*/
 
   return (
     <div className="panel">

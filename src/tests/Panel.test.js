@@ -1,11 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import Panel from '../container/Panel';
+import Panel from '../containers/Panel';
+
+import { SPEED_MAP, MIN_INTERVAL } from '../constants';
+
+const speedNames = Array.from(SPEED_MAP.keys());
+const defaultInterval = SPEED_MAP.values().next().value;
+const intervals = Array.from(SPEED_MAP.values());
 
 const defaultProps = {
   makeRandomMoves: () => {},
   resetBoard: () => {},
-  interval: 500,
-  speedNames: ['Slow', 'Fast'],
+  interval: defaultInterval,
+  speedNames: speedNames,
   speedIndex: 0,
   setSpeed: () => {},
   displaySettings: {
@@ -19,6 +25,13 @@ const defaultProps = {
 }
 
 describe('The Panel component', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.clearAllTimers();
+  });
+
   it('renders a Start button', () => {
     render(<Panel {...defaultProps} />);
     const startButton = screen.getByText('Start');
@@ -26,7 +39,6 @@ describe('The Panel component', () => {
   });
 
   it('disables the start button and enables stop button after clicking', () => {
-    jest.useFakeTimers();
     let isMoving = false;
     const setIsMoving = (bool) => { isMoving = bool; };
     const { rerender } = render(<Panel
@@ -39,7 +51,8 @@ describe('The Panel component', () => {
     expect(startButton).not.toHaveAttribute('disabled');
     expect(stopButton).toHaveAttribute('disabled');
     fireEvent.click(startButton);
-    jest.advanceTimersByTime(600);
+
+    jest.advanceTimersByTime(defaultInterval);
     rerender(<Panel
       {...defaultProps}
       isMoving={isMoving}
@@ -51,7 +64,6 @@ describe('The Panel component', () => {
   });
 
   it('starts an interval timer to move the knight when the user clicks start', () => {
-    jest.useFakeTimers();
     const spy = jest.fn();
     render(<Panel
       {...defaultProps} 
@@ -62,90 +74,95 @@ describe('The Panel component', () => {
     fireEvent.click(startButton);
     expect(global.setInterval).toHaveBeenCalled();
     expect(spy).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(600);
+
+    jest.advanceTimersByTime(defaultInterval);
     expect(spy).toHaveBeenCalledTimes(1);
-    jest.advanceTimersByTime(500);
+
+    jest.advanceTimersByTime(defaultInterval);
     expect(spy).toHaveBeenCalledTimes(2);
     jest.clearAllTimers();
   });
 
   it('lets the user speed up the knight moves', () => {
-    jest.useFakeTimers();
     const spy = jest.fn();
     render(<Panel
       {...defaultProps}
       makeRandomMoves={spy}
-      interval={200}
+      interval={intervals[1]}
     />);
     const startButton = screen.getByText('Start');
     fireEvent.click(startButton);
     expect(spy).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(500);
-    expect(spy).toHaveBeenCalledTimes(2);
-    jest.advanceTimersByTime(600);
-    expect(spy).toHaveBeenCalledTimes(5);
-    jest.clearAllTimers();
+
+    jest.advanceTimersByTime(defaultInterval);
+    const expectedCalls = Math.floor(defaultInterval / intervals[1])
+    expect(spy).toHaveBeenCalledTimes(expectedCalls);
+
+    jest.advanceTimersByTime(defaultInterval);
+    const moreExpectedCalls = Math.floor(2 * defaultInterval / intervals[1])
+    expect(spy).toHaveBeenCalledTimes(moreExpectedCalls);
   });
 
   it('lets the user speed up the knight moves a lot with batched updates', () => {
-    jest.useFakeTimers();
     const spy = jest.fn();
     render(<Panel
       {...defaultProps}
       makeRandomMoves={spy}
-      interval={1}
+      interval={intervals[4]}
     />);
     const startButton = screen.getByText('Start');
     fireEvent.click(startButton);
     expect(spy).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(550);
-    expect(spy).toHaveBeenCalledTimes(5);
-    expect(spy).toHaveBeenCalledWith(100);
-    expect(spy).toHaveBeenLastCalledWith(100);
-    jest.advanceTimersByTime(600);
-    expect(spy).toHaveBeenCalledTimes(11);
-    jest.clearAllTimers();
+    expect(intervals[4]).toBeLessThan(MIN_INTERVAL);
+
+    jest.advanceTimersByTime(defaultInterval);
+    const expectedTimesCalled = Math.floor(defaultInterval / MIN_INTERVAL);
+    const expectedBatchSize = MIN_INTERVAL / intervals[4];
+    expect(spy).toHaveBeenCalledTimes(expectedTimesCalled);
+    expect(spy).toHaveBeenCalledWith(expectedBatchSize);
+    expect(spy).toHaveBeenLastCalledWith(expectedBatchSize);
   });
 
   it('lets the user speed up the knight while already moving', () => {
-    jest.useFakeTimers();
     const spy = jest.fn();
     let isMoving = false;
     const setIsMoving = (bool) => { isMoving = bool; };
     const { rerender } = render(<Panel
       {...defaultProps}
       makeRandomMoves={spy}
-      interval={500}
       isMoving={isMoving}
       setIsMoving={setIsMoving}
     />);
     const startButton = screen.getByText('Start');
     fireEvent.click(startButton);
     expect(spy).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(550);
+
+    jest.advanceTimersByTime(defaultInterval);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith(1);
-    // imperatively changing interval, Main tests UI
+    expect(global.clearInterval).not.toHaveBeenCalled();
+    expect(global.setInterval).toHaveBeenCalledTimes(1);
+    // imperatively changing interval, Main container tests UI
     rerender(<Panel
       {...defaultProps}
       makeRandomMoves={spy}
-      interval={100}
+      interval={intervals[4]}
       isMoving={isMoving}
       setIsMoving={setIsMoving}
     />);
-    jest.advanceTimersByTime(650);
-    rerender(<Panel
-      {...defaultProps}
-      makeRandomMoves={spy}
-      interval={100}
-    />);
-    expect(spy).toHaveBeenCalledTimes(7);
-    jest.clearAllTimers();
+
+    jest.advanceTimersByTime(defaultInterval);
+    expect(global.clearInterval).toHaveBeenCalled()
+    expect(global.setInterval).toHaveBeenCalledTimes(2);
+    const callInterval = Math.max(MIN_INTERVAL, intervals[4]);
+    const expectedTimesCalled = 1 + Math.floor(defaultInterval / callInterval);
+    const expectedBatchSize = MIN_INTERVAL / intervals[4];
+    expect(spy).toHaveBeenCalledTimes(expectedTimesCalled);
+    expect(spy).toHaveBeenLastCalledWith(expectedBatchSize);
   });
 
 
   it('stops the interval timer and the knight when the user clicks stop', () => {
-    jest.useFakeTimers();
     const spy = jest.fn();
     let isMoving = false;
     const setIsMoving = (bool) => { isMoving = bool; };
@@ -160,7 +177,8 @@ describe('The Panel component', () => {
     fireEvent.click(startButton);
     expect(global.setInterval).toHaveBeenCalled();
     expect(spy).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(600);
+
+    jest.advanceTimersByTime(defaultInterval);
     rerender(<Panel
       {...defaultProps}
       makeRandomMoves={spy}
@@ -170,9 +188,10 @@ describe('The Panel component', () => {
     expect(spy).toHaveBeenCalledTimes(1);
     fireEvent.click(stopButton);
     expect(global.clearInterval).toHaveBeenCalled();
-    jest.advanceTimersByTime(500);
+
+    jest.advanceTimersByTime(defaultInterval);
     expect(spy).toHaveBeenCalledTimes(1);
-    jest.clearAllTimers();
+    expect(global.setInterval).toHaveBeenCalledTimes(1);
   });
 
   it('calls resetBoard when user clicks reset and stops moving if needed', () => {
@@ -188,6 +207,7 @@ describe('The Panel component', () => {
     fireEvent.click(resetButton);
     expect(resetSpy).toHaveBeenCalled();
     expect(setIsMovingSpy).not.toHaveBeenCalled();
+
     rerender(<Panel
       {...defaultProps}
       resetBoard={resetSpy}
@@ -200,22 +220,18 @@ describe('The Panel component', () => {
   });
 
   it('does not clear the interval timer when unmounting if not needed', () => {
-    jest.useFakeTimers();
     const { unmount } = render(<Panel {...defaultProps} />);
     expect(global.clearInterval).not.toHaveBeenCalled();
-    unmount(); // timer not started
+    unmount(); // timer not started, should not call clear interval
     expect(global.clearInterval).not.toHaveBeenCalled();
-    jest.clearAllTimers();
   });
 
   it('clears the interval timer when unmounting if needed', () => {
-    jest.useFakeTimers();
     const { unmount } = render(<Panel {...defaultProps} />);
     expect(global.clearInterval).not.toHaveBeenCalled();
     const startButton = screen.getByText('Start');
     fireEvent.click(startButton);
     unmount();
     expect(global.clearInterval).toHaveBeenCalled();
-    jest.clearAllTimers();
   });
 });

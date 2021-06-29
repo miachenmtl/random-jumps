@@ -4,14 +4,12 @@ import {
   getRankName,
   getFileName,
   parseSquareName,
-  Vector
-}from '../container/utils';
+}from '../utils/boardUtils';
+import { checkIfBIsNotOutsideAAndC } from '../utils/mathUtils';
 
-// FIXME getLegalMoves needs a callback from the Main container which this replaces
-// DRY this
 function checkIfLegal(fileIndex, rankIndex) {
-  const hasLegalFile = (0 <= fileIndex) && (fileIndex <= 7);
-  const hasLegalRank = (0 <= rankIndex) && (rankIndex <= 7);
+  const hasLegalFile = checkIfBIsNotOutsideAAndC(0, fileIndex, 7);
+  const hasLegalRank = checkIfBIsNotOutsideAAndC(0, rankIndex, 7);
   return hasLegalFile && hasLegalRank;
 }
 
@@ -84,30 +82,5 @@ describe('The getLegalSquares function', () => {
     expect(newerMoves).toEqual(newMoves);
     getLegalMoves(1, 2, checkIfLegal).map(([x, y]) => getSquareName(x, y));
     expect(spy.mock.calls.length).toBeGreaterThan(totalCalls);
-  });
-});
-
-describe('The Vector class', () => {
-  it('can pairwise add two 2d vectors', () => {
-    const expected = [5, 3];
-    const A = new Vector(3, 5);
-    const B = new Vector(2, -2);
-    const actual = A.plus(B).array;
-    expect(actual).toEqual(expected);
-  });
-
-  it('can multiply a two 2d vector by a scalar', () => {
-    const expected = [6, 10];
-    const A = new Vector(3, 5);
-    const B = 2;
-    const actual = A.times(B).array;
-    expect(actual).toEqual(expected);
-  });
-
-  it('can reverse (x, y) to (y, x)', () => {
-    const expected = [6, 10];
-    const A = new Vector(10, 6);
-    const actual = A.reverse().array;
-    expect(actual).toEqual(expected);
   });
 });

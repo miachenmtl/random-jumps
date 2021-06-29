@@ -1,26 +1,6 @@
-const Vector = class {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.array = [x, y];
-  }
+import { Vector } from './mathUtils';
+import { ALPHABET } from '../constants';
 
-  plus = (addedVector) => {
-    const newCoords = [this.x + addedVector.x, this.y + addedVector.y];
-    return new Vector(...newCoords);
-  }
-
-  times = (multipliedScalar) => {
-    const newCoords = [multipliedScalar * this.x, multipliedScalar * this.y];
-    return new Vector(...newCoords);
-  }
-
-  reverse = () => {
-    return new Vector(this.y, this.x);
-  }
-}
-
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 const getFileName = fileIndex => ALPHABET[fileIndex];
 const getRankName = rankIndex => (rankIndex + 1).toString();
 const getSquareName = (fileIndex, rankIndex) =>
@@ -68,6 +48,5 @@ export {
   getSquareName,
   getRankName,
   getFileName,
-  parseSquareName,
-  Vector
+  parseSquareName
 };

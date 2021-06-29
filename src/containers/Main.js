@@ -4,17 +4,16 @@ import Board from '../components/Board'
 import Rank from '../components/Rank';
 import Square from '../components/Square';
 import Knight from '../components/Knight';
-import { getSquareName, getLegalMoves, getRankName, getFileName } from './utils';
+import { getSquareName, getLegalMoves, getRankName, getFileName } from '../utils/boardUtils';
+import { getGradientImageData, getHeatmapRGB } from '../utils/imageUtils';
+import { checkIfBIsNotOutsideAAndC } from '../utils/mathUtils';
 
 import Panel from './Panel';
-
-const SPEED_MAP = new Map([
-  ['Walk', 500],
-  ['Trot', 250],
-  ['Gallop', 100],
-  ['Jet', 10],
-  ['Warp', 1]
-]);
+import {
+  SPEED_MAP,
+  CANVAS_WIDTH,
+  MIN_INTERVAL
+} from '../constants';
 
 class Main extends Component {
   constructor() {
@@ -27,12 +26,22 @@ class Main extends Component {
     );
     visitCounts[0][0] = 1;
 
+
+    // fallbacks as a workaround for jsdom not doing css variables:
+    // see https://github.com/jsdom/cssstyle/pull/111
+    const lightSqBg = getComputedStyle(document.documentElement).getPropertyValue('--light-square-bg-color')
+      || 'white';
+    const darkSqBg = getComputedStyle(document.documentElement).getPropertyValue('--dark-square-bg-color')
+      || 'black';
+    const gradientImageData = getGradientImageData(CANVAS_WIDTH, [lightSqBg, darkSqBg]);
+
     this.boardEl = null;
 
     this.state = {
       totalRanks: totalRanks,
       totalFiles: totalFiles,
       totalRandomMoves: 1,
+      maxSquareCount: 1,
       visitCounts: visitCounts,
       currentRankIndex: 0,
       currentFileIndex: 0,
@@ -40,10 +49,12 @@ class Main extends Component {
       speedIndex: 0,
       displaySettings: {
         showKnight: true,
-        showCounts: true,
-        showPercentage: false,
-        showHeatmap: false
+        showCount: true,
+        showPercent: false,
+        showHeatmap: false,
+        showHighlight: true
       },
+      gradientImageData: gradientImageData,
       isResizing: false,
       isMoving: false,
       timeoutId: null
@@ -90,6 +101,10 @@ class Main extends Component {
     })
   }
 
+  // heatmap methods
+  getHeatmapHexString = heatValue =>
+    getHeatmapRGB(heatValue, this.state.gradientImageData);
+
   // logic utils for manipulating squares
   // visually and in html, first row of table is last logical rank array
   reverseRankIndex = rankIndex => this.state.totalRanks - rankIndex - 1
@@ -99,8 +114,8 @@ class Main extends Component {
   });
 
   checkIfLegal = (fileIndex, rankIndex) => {
-    const hasLegalFile = (0 <= fileIndex) && (fileIndex <= this.state.totalFiles - 1);
-    const hasLegalRank = (0 <= rankIndex) && (rankIndex <= this.state.totalRanks - 1);
+    const hasLegalFile = checkIfBIsNotOutsideAAndC(0, fileIndex, this.state.totalFiles - 1);
+    const hasLegalRank = checkIfBIsNotOutsideAAndC(0, rankIndex, this.state.totalRanks - 1);
     return hasLegalFile && hasLegalRank;
   }
 
@@ -117,10 +132,17 @@ class Main extends Component {
     );
     const lastMove = newMoves.slice(-1);
 
+    const newMaxSquareCount = newVisitCounts
+      .flat()
+      .reduce(
+        (acc, val) => Math.max(acc, val)
+      );
+
     this.setState({
       currentFileIndex: lastMove[0][0],
       currentRankIndex: lastMove[0][1],
-      visitCounts: newVisitCounts
+      visitCounts: newVisitCounts,
+      maxSquareCount: newMaxSquareCount
     });
   }
 
@@ -161,8 +183,12 @@ class Main extends Component {
     );
     visitCounts[0][0] = 1;
     const [currentRankIndex, currentFileIndex] = [0, 0];
+    const maxSquareCount = 1;
     this.setState({
-      visitCounts, currentFileIndex, currentRankIndex
+      visitCounts,
+      currentFileIndex,
+      currentRankIndex,
+      maxSquareCount
     })
   }
   changeDimensions = () => {}
@@ -170,8 +196,7 @@ class Main extends Component {
   render() {
     // TODO Have single source of truth for MIN_INTERVAL
     const interval = Array.from(SPEED_MAP.values())[this.state.speedIndex];
-    const displayKnight = this.state.displaySettings.showKnight && (interval >= 100);
-
+    const displayKnight = this.state.displaySettings.showKnight && (interval >= MIN_INTERVAL);
     return (
       <main>
         <div className="wrapper">
@@ -189,7 +214,10 @@ class Main extends Component {
                         <Square
                           key={getFileName(logicalFileIndex) + rankName}
                           visitCount={visitCount}
+                          maxSquareCount={this.state.maxSquareCount}
                           squareName={getFileName(logicalFileIndex) + rankName}
+                          getHeatmapHexString={this.getHeatmapHexString}
+                          displaySettings={this.state.displaySettings}
                           isCurrent={isCurrentRank && (logicalFileIndex === this.state.currentFileIndex)}
                         />
                       ))
