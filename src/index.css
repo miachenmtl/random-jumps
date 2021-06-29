@@ -50,14 +50,24 @@ table {
 }
 
 td {
-  padding: 4px !important; /* milligram removes right padding from last cell */
-  text-align: right;
-  vertical-align: bottom;
-  font-size: 1.5em;
+  position: relative;
+  font-size: min(1.5em, calc(0.3 * var(--board-width) / var(--total-ranks)));
   color: black;
   filter: brightness(1);
   transition: all 0.2s;
   border: none;
+}
+
+td span.count {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+}
+
+td span.percent {
+  position: absolute;
+  right: 4px;
+  top: 2px;
 }
 
 td.current {

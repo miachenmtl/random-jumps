@@ -149,8 +149,65 @@ describe('The Main container', () => {
     fireEvent.click(showKnightCheckbox);
     expect(knight).not.toBeVisible();
     fireEvent.click(showKnightCheckbox);
-    await waitFor(() => {
-      expect(screen.getByAltText('Knight')).toBeVisible();
-    });
+    expect(screen.getByAltText('Knight')).toBeVisible();
+  });
+
+  it('allows the user to show and hide the count for each square', async () => {
+    const getEmptySquareCount = () =>
+      within(screen.getByRole('table')).getAllByText('0').length;
+    const emptySquareCount = getEmptySquareCount();
+    expect(emptySquareCount).toBe(63);
+    const showCountCheckbox = screen.getByRole('checkbox', { name: 'Count' });
+    fireEvent.click(showCountCheckbox);
+    expect(screen.queryByText('0')).toBeNull();
+    fireEvent.click(showCountCheckbox);
+    expect(emptySquareCount).toBe(63);
+  });
+
+  it('allows the user to show and hide the percentage for each square', () => {
+    expect(screen.queryByText('0%')).toBeNull();
+    const showPercentCheckbox = screen.getByRole('checkbox', { name: '% of max' });
+    fireEvent.click(showPercentCheckbox);
+    const expectedCount = 63;
+    const actual = within(screen.getByRole('table')).getAllByText('0%').length;
+    expect(actual).toBe(expectedCount);
+    fireEvent.click(showPercentCheckbox);
+    expect(screen.queryByText('0%')).toBeNull();
+  });
+
+  it('allows the user to turn heatmap mode on and off for each square', () => {
+    // not ideal bc css is not applied in test environment
+    // it depends on the hardcoded 'white' bg color workaround
+    const getWhiteSquareCount = () => {
+      const squares = screen.getAllByRole('cell');
+      // NB: logging the bg color in Square.js gives yields #ffffff
+      const whiteSquareCount = squares.reduce(
+        (acc, square) => acc +
+          +(getComputedStyle(square).getPropertyValue('background-color') === 'rgb(255, 255, 255)'),
+          0
+      );
+      return whiteSquareCount;
+    }
+    const initialCount = getWhiteSquareCount();
+    expect(initialCount).toBe(0);
+    const showHeatmapCheckbox = screen.getByRole('checkbox', { name: 'Heatmap' });
+    fireEvent.click(showHeatmapCheckbox);
+
+    const expectedCount = 63;
+    const actualCount = getWhiteSquareCount();
+    expect(actualCount).toBe(expectedCount);
+
+    fireEvent.click(showHeatmapCheckbox);
+    const resetLightSquareCount = getWhiteSquareCount();
+    expect(resetLightSquareCount).toBe(0);
+  });
+
+  it('allows the user to turn the square highlight on and off', () => {
+    expect(document.querySelectorAll('.current')).toHaveLength(1);
+    const showHighlightCheckbox = screen.getByRole('checkbox', { name: 'Highlight' });
+    fireEvent.click(showHighlightCheckbox);
+    expect(document.querySelectorAll('.current')).toHaveLength(0);
+    fireEvent.click(showHighlightCheckbox);
+    expect(document.querySelectorAll('.current')).toHaveLength(1);
   });
 });
