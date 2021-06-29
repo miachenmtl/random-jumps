@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Settings from '../components/Settings';
+import Settings from '../containers/Settings';
 
 const defaultProps = {
   speedNames: ['Slow', 'Fast'],
