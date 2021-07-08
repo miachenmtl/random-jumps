@@ -75,6 +75,14 @@ td.current {
   outline: 2px solid grey;
 }
 
+td.current.dragged {
+  filter: brightness(0.8);
+}
+
+td.drop-target {
+  filter: brightness(1.5);
+}
+
 table tr:nth-child(odd) td:nth-child(odd),
 table tr:nth-child(even) td:nth-child(even) {
   background-color: var(--light-square-bg-color);
@@ -106,6 +114,13 @@ div.piece {
 .panel button {
   display: block;
   width: 100%;
+}
+
+.button-transparent {
+  color: blue;
+  background-color: transparent;
+  border: none;
+  margin: 0;
 }
 
 .settings-label {
@@ -156,17 +171,18 @@ div.piece {
   font-weight: 500;
 }
 
-.display-settings {
+.settings-content .section {
   position: relative;
+  margin: 16px 0;
   border: 1px solid #9b4dca;
   border-radius: 4px;
   background-color: inherit;
   padding: 10px;
 }
 
-.display-settings::after {
+.settings-content .section::after {
   position: absolute;
-  content: 'Display';
+  content: attr(data-heading);
   left: 10px;
   height: 2rem;
   top: -1.3rem;
@@ -175,8 +191,25 @@ div.piece {
   background-color: inherit;
 }
 
-input[type='checkbox'], input[type='checkbox'] + label {
-  display: inline;
+label.disabled {
+  color: gray;
+}
+
+input[type='checkbox'], input[type='checkbox'] + label,
+label.number, input[type='number'] {
+  display: inline-block;
   margin: 4px;
   font-size: 1.5rem;
+}
+
+label.number {
+  width: 50px;
+}
+
+input[type='number'] {
+  width: 50px;
+  height: 30px;
+  padding: 0;
+  padding-left: 8px;
+  text-align: center;
 }

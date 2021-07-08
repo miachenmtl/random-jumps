@@ -1,5 +1,5 @@
 // import { ReactComponent as KnightSvg } from '../assets/Chess_ndt45.svg';
-import knightSvg from '../assets/Chess_ndt45.svg';
+import knightSvg from "../assets/Chess_ndt45.svg";
 
 // svg from WikiCommons, importing for img element to add alt text
 /*
@@ -9,8 +9,24 @@ import knightSvg from '../assets/Chess_ndt45.svg';
   https://commons.wikimedia.org/w/index.php?curid=1499807
 */
 
-function Knight({ squareWidth, visualRankIndex, fileIndex, interval, isResizing }) {
-  const transitionValue = isResizing ? 'none' : `all ${interval / 2}ms`;
+function Knight({
+  squareWidth,
+  visualRankIndex,
+  fileIndex,
+  interval,
+  setIsDragging,
+  isDraggable,
+  isResizing,
+}) {
+  const transitionValue = isResizing ? "none" : `all ${interval / 2}ms`;
+  const handleDragStart = (event) => {
+    event.dataTransfer.setData("text/plain", `${fileIndex},${visualRankIndex}`);
+    event.dataTransfer.dropEffect = "move";
+    setIsDragging(true);
+  };
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
   return (
     <div
       className="piece"
@@ -19,10 +35,14 @@ function Knight({ squareWidth, visualRankIndex, fileIndex, interval, isResizing 
         height: squareWidth,
         left: squareWidth * fileIndex,
         top: squareWidth * visualRankIndex,
-        transition: transitionValue
+        transition: transitionValue,
+        cursor: isDraggable ? "grab" : "default",
       }}
     >
       <img
+        draggable={isDraggable}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
         width={0.7 * squareWidth}
         height={0.7 * squareWidth}
         src={knightSvg}

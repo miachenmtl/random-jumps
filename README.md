@@ -1,9 +1,6 @@
 TODO:
 
-- change board dimensions
-  - limit between 5 and 15, say?
-  - have an infinite mode that just does a heatmap which scales?
-- when board is in reset state, knight is draggable to any square
+- infinite mode
 - manual mode allows user to move knight to legal squares while updating counts
 - about
 - readme
@@ -14,5 +11,6 @@ TODO:
   - copy counts to clipboard as csv
 - themes: light and dark
 - languages: english and français
+- style inputs (checkbox, select, number)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
