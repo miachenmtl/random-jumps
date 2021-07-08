@@ -226,6 +226,13 @@ class Main extends Component {
   setIsMoving = (bool) => {
     this.setState({ isMoving: bool });
   };
+  setIsDragging = (bool) => {
+    this.setState({ isDragging: bool });
+  };
+  setDropSquare = (squareName) => {
+    const { fileIndex, rankIndex } = parseSquareName(squareName);
+    this.resetBoard(rankIndex, fileIndex);
+  };
 
   render() {
     const interval = Array.from(SPEED_MAP.values())[this.state.speedIndex];
@@ -245,34 +252,44 @@ class Main extends Component {
                 const rankName = getRankName(logicalRankIndex);
 
                 return (
-                  <Rank key={logicalRankIndex} isCurrent={isCurrentRank} rankName={rankName}>
-                    {
-                      rankVisits.map((visitCount, logicalFileIndex) => (
-                        <Square
-                          key={getFileName(logicalFileIndex) + rankName}
-                          visitCount={visitCount}
-                          maxSquareCount={this.state.maxSquareCount}
-                          squareName={getFileName(logicalFileIndex) + rankName}
-                          getHeatmapHexString={this.getHeatmapHexString}
-                          displaySettings={this.state.displaySettings}
-                          isCurrent={isCurrentRank && (logicalFileIndex === this.state.currentFileIndex)}
-                        />
-                      ))
-                    }
+                  <Rank
+                    key={logicalRankIndex}
+                    isCurrent={isCurrentRank}
+                    rankName={rankName}
+                  >
+                    {rankVisits.map((visitCount, logicalFileIndex) => (
+                      <Square
+                        key={getFileName(logicalFileIndex) + rankName}
+                        visitCount={visitCount}
+                        maxSquareCount={this.state.maxSquareCount}
+                        squareName={getFileName(logicalFileIndex) + rankName}
+                        getHeatmapHexString={this.getHeatmapHexString}
+                        setDropSquare={this.setDropSquare}
+                        displaySettings={this.state.displaySettings}
+                        isCurrent={
+                          isCurrentRank &&
+                          logicalFileIndex === this.state.currentFileIndex
+                        }
+                        isDragging={this.state.isDragging}
+                      />
+                    ))}
                   </Rank>
                 );
               })}
           </Board>
-          {
-            displayKnight &&
-              <Knight
-                squareWidth={this.state.squareWidth}
-                visualRankIndex={this.reverseRankIndex(this.state.currentRankIndex)}
-                fileIndex={this.state.currentFileIndex}
-                interval={interval}
-                isResizing={this.state.isResizing}
-              />
-          }
+          {displayKnight && (
+            <Knight
+              squareWidth={this.state.squareWidth}
+              visualRankIndex={this.reverseRankIndex(
+                this.state.currentRankIndex
+              )}
+              fileIndex={this.state.currentFileIndex}
+              interval={interval}
+              setIsDragging={this.setIsDragging}
+              isDraggable={this.state.totalRandomMoves <= 1}
+              isResizing={this.state.isResizing}
+            />
+          )}
           <Panel
             makeRandomMoves={this.makeRandomMoves}
             resetBoard={this.resetBoard}

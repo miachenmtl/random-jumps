@@ -75,6 +75,14 @@ td.current {
   outline: 2px solid grey;
 }
 
+td.current.dragged {
+  filter: brightness(0.8);
+}
+
+td.drop-target {
+  filter: brightness(1.5);
+}
+
 table tr:nth-child(odd) td:nth-child(odd),
 table tr:nth-child(even) td:nth-child(even) {
   background-color: var(--light-square-bg-color);

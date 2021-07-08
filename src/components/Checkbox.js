@@ -1,4 +1,5 @@
 function Checkbox({ id, isChecked, isDisabled, children, handleChange }) {
+  const labelClass = isDisabled ? "disabled" : undefined;
   return (
     <div>
       <input
@@ -8,8 +9,10 @@ function Checkbox({ id, isChecked, isDisabled, children, handleChange }) {
         checked={isChecked}
         disabled={isDisabled}
       />
-      <label htmlFor={id}>{children}</label> 
-    </div>    
+      <label className={labelClass} htmlFor={id}>
+        {children}
+      </label>
+    </div>
   );
 }
 
