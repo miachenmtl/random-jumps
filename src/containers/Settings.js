@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import Checkbox from '../components/Checkbox';
-import { SPEED_MAP, MIN_INTERVAL } from '../constants';
+import Checkbox from "../components/Checkbox";
+import NumberInput from "../components/NumberInput";
+import { SPEED_MAP, MIN_INTERVAL } from "../constants";
 
-const intervals = Array.from(SPEED_MAP.values()); 
+const intervals = Array.from(SPEED_MAP.values());
 
 function Settings({
   speedNames,
@@ -14,15 +15,30 @@ function Settings({
     showCount,
     showPercent,
     showHeatmap,
-    showHighlight
+    showHighlight,
   },
-  toggleDisplaySettings
+  toggleDisplaySettings,
+  initialTotalFiles,
+  initialTotalRanks,
+  changeDimensions,
 }) {
   const [expanded, setExpanded] = useState(false);
-  const className = `settings-label${expanded ? ' expanded' : ''}`;
+  const [newTotalFiles, setNewTotalFiles] = useState(initialTotalFiles);
+  const [newTotalRanks, setNewTotalRanks] = useState(initialTotalRanks);
+  const className = `settings-label${expanded ? " expanded" : ""}`;
   const contentStyle = {
     opacity: expanded ? 1 : 0,
-    transition: 'opacity 0.3s ease-in'
+    transition: "opacity 0.3s ease-in",
+  };
+
+  const handleFiles = ({ target: { value } }) => {
+    setNewTotalFiles(parseInt(value, 10));
+  };
+  const handleRanks = ({ target: { value } }) => {
+    setNewTotalRanks(parseInt(value, 10));
+  };
+  const handleUpdate = () => {
+    changeDimensions(newTotalFiles, newTotalRanks);
   };
 
   return (
@@ -33,7 +49,9 @@ function Settings({
         role="button"
         aria-expanded={expanded}
         aria-controls="settings-controls"
-        onClick={() => { setExpanded(!expanded); }}
+        onClick={() => {
+          setExpanded(!expanded);
+        }}
       >
         Settings
       </div>
@@ -43,7 +61,7 @@ function Settings({
         style={contentStyle}
         data-testid="cx"
       >
-        <label htmlFor="speed-select">Speed</label> 
+        <label htmlFor="speed-select">Speed</label>
         <select
           id="speed-select"
           value={speedNames[speedIndex]}
@@ -51,40 +69,83 @@ function Settings({
           multiple={false}
         >
           {speedNames.map((name, i) => (
-            <option value={name} key={i}>{name}</option>
+            <option value={name} key={i}>
+              {name}
+            </option>
           ))}
         </select>
-        <div className="display-settings">
+        <div className="section" data-heading="Display">
           <Checkbox
             id="show-knight"
             isChecked={showKnight}
             isDisabled={intervals[speedIndex] < MIN_INTERVAL}
-            handleChange={() => { toggleDisplaySettings('showKnight'); }}
-          >Knight</Checkbox>
+            handleChange={() => {
+              toggleDisplaySettings("showKnight");
+            }}
+          >
+            Knight
+          </Checkbox>
           <Checkbox
             id="show-count"
             isChecked={showCount}
-            handleChange={() => { toggleDisplaySettings('showCount'); }}
-          >Count</Checkbox>
+            handleChange={() => {
+              toggleDisplaySettings("showCount");
+            }}
+          >
+            Count
+          </Checkbox>
           <Checkbox
             id="show-percent"
             isChecked={showPercent}
-            handleChange={() => { toggleDisplaySettings('showPercent'); }}
-          >% of max</Checkbox>
+            handleChange={() => {
+              toggleDisplaySettings("showPercent");
+            }}
+          >
+            % of max
+          </Checkbox>
           <Checkbox
             id="show-heatmap"
             isChecked={showHeatmap}
-            handleChange={() => { toggleDisplaySettings('showHeatmap'); }}
-          >Heatmap</Checkbox>
+            handleChange={() => {
+              toggleDisplaySettings("showHeatmap");
+            }}
+          >
+            Heatmap
+          </Checkbox>
           <Checkbox
             id="show-highlight"
             isChecked={showHighlight}
-            handleChange={() => { toggleDisplaySettings('showHighlight'); }}
-          >Highlight</Checkbox>
+            handleChange={() => {
+              toggleDisplaySettings("showHighlight");
+            }}
+          >
+            Highlight
+          </Checkbox>
+        </div>
+        <div className="section" data-heading="Board">
+          <NumberInput
+            label="Ranks"
+            value={newTotalRanks}
+            handleChange={handleRanks}
+          />
+          <NumberInput
+            label="Files"
+            value={newTotalFiles}
+            handleChange={handleFiles}
+          />
+          <Checkbox id="infiniteMode" isDisabled={true}>
+            Infinite
+          </Checkbox>
+          <button
+            type="button"
+            className="button button-transparent"
+            onClick={handleUpdate}
+          >
+            New Board
+          </button>
         </div>
       </div>
     </div>
-
   );
 }
 

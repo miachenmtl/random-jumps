@@ -175,6 +175,36 @@ describe('The Main container', () => {
     expect(screen.queryByText('0%')).toBeNull();
   });
 
+  it('correctly shows the percentage of max visits for each square', () => {
+    const showPercentCheckbox = screen.getByRole('checkbox', { name: '% of max' });
+    const startButton = screen.getByText('Start');
+    fireEvent.click(startButton);
+    fireEvent.click(showPercentCheckbox);
+
+    jest.advanceTimersByTime(2 * defaultInterval);
+
+    // if knight returned to initial square, it will be 100% and 50%
+    // otherwise, there will be three 100%
+
+    const maxPercentCount = screen.getAllByText('100%').length;
+
+    // this is probably a bad idea because of possibility of unreproducibility
+    // due to rng, but mocking the random moves is both unwieldy and non-user-oriented
+    // TODO: if there's a manual mode implememnted, this can be circumvented
+    let isCorrect = false;
+    if (maxPercentCount === 1) {
+      if (screen.getAllByText('50%').length === 1) {
+        isCorrect = true;
+      }
+    }
+    if (maxPercentCount === 3) {
+      if (screen.getAllByText('0%').length === 61) {
+        isCorrect = true;
+      }
+    }
+    expect(isCorrect).toBe(true);
+  });
+
   it('allows the user to turn heatmap mode on and off for each square', () => {
     // not ideal bc css is not applied in test environment
     // it depends on the hardcoded 'white' bg color workaround
@@ -209,5 +239,42 @@ describe('The Main container', () => {
     expect(document.querySelectorAll('.current')).toHaveLength(0);
     fireEvent.click(showHighlightCheckbox);
     expect(document.querySelectorAll('.current')).toHaveLength(1);
+  });
+
+  it('allows the user to change the board dimensions', () => {
+    const ranksInput = screen.getByLabelText('Ranks');
+    const filesInput = screen.getByLabelText('Files');
+    fireEvent.change(ranksInput, { target: { value: '10' } });
+    fireEvent.change(filesInput, { target: { value: '12' } });
+    const newBoardButton = screen.getByText('New Board');
+    expect(screen.getAllByRole('cell')).toHaveLength(64);
+    expect(screen.queryByTitle('l9')).toBeNull();
+
+    fireEvent.click(newBoardButton);
+    expect(screen.getAllByRole('cell')).toHaveLength(120);
+    expect(screen.getAllByRole('row')).toHaveLength(10);
+    expect(screen.getByTitle('l9')).toBeInTheDocument();
+  });
+
+  it('allows the user to change the board dimensions while the knight is moving', () => {
+    const startButton = screen.getByText('Start');
+    fireEvent.click(startButton);
+
+    jest.advanceTimersByTime(2 * defaultInterval);
+    expect(global.setInterval).toHaveBeenCalledTimes(1);
+    expect(global.clearInterval).not.toHaveBeenCalled();
+    const ranksInput = screen.getByLabelText('Ranks');
+    const filesInput = screen.getByLabelText('Files');
+    fireEvent.change(ranksInput, { target: { value: '10' } });
+    fireEvent.change(filesInput, { target: { value: '12' } });
+    const newBoardButton = screen.getByText('New Board');
+    expect(screen.getAllByRole('cell')).toHaveLength(64);
+
+    fireEvent.click(newBoardButton);
+    jest.advanceTimersByTime(2 * defaultInterval);
+    expect(global.setInterval).toHaveBeenCalledTimes(1);
+    expect(global.clearInterval).toHaveBeenCalled();
+    expect(screen.getAllByRole('cell')).toHaveLength(120);
+    expect(screen.getAllByRole('row')).toHaveLength(10);
   });
 });
