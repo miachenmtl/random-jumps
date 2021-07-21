@@ -13,7 +13,9 @@ import {
 } from "../utils/boardUtils";
 import { getGradientImageData, getHeatmapRGB } from "../utils/imageUtils";
 
-import Panel from "./Panel";
+import Buttons from "./Buttons";
+import DisclosureWidget from "../components/DisclosureWidget";
+import Settings from "./Settings";
 import { SPEED_MAP, CANVAS_WIDTH, MIN_INTERVAL } from "../constants";
 
 class Main extends Component {
@@ -63,7 +65,6 @@ class Main extends Component {
       },
       gradientImageData: gradientImageData,
       isResizing: false,
-      isMoving: false,
       isDragging: false,
       timeoutId: null,
     };
@@ -157,22 +158,47 @@ class Main extends Component {
       );
       const nextMoveIndex = Math.floor(Math.random() * possibleMoves.length);
       const nextMove = possibleMoves[nextMoveIndex];
+      const nextSquareName = getSquareName(...nextMove);
+      tempReturnCount += 1;
+      if (nextSquareName === startSquareName) {
+        newReturnCounts.push(tempReturnCount);
+        tempReturnCount = 0;
+      }
+
+      tempTourCount += 1;
+      tempVisitedSquareNameSet.add(nextSquareName);
+      if (tempVisitedSquareNameSet.size === totalFiles * totalRanks) {
+        newTourCounts.push(tempTourCount);
+        tempVisitedSquareNameSet = new Set([nextSquareName]);
+        tempTourCount = 0;
+      }
       newMoves.push(nextMove);
       [tempFileIndex, tempRankIndex] = nextMove;
     }
-
     this.moveKnight(newMoves);
-    this.setState({ totalRandomMoves: totalRandomMoves + totalNewMoves });
+
+    const newStats = {
+      totalMoves: totalMoves + totalNewMoves,
+      countsForReturn: countsForReturn.concat(newReturnCounts),
+      countsForTour: countsForTour.concat(newTourCounts),
+      currentReturnCount: tempReturnCount,
+      currentTourCount: tempTourCount,
+    };
+
+    this.setState({
+      stats: newStats,
+      visitedSquareNameSet: tempVisitedSquareNameSet,
+    });
   };
 
-  setSpeed = (speedName) => {
+  setSpeed = ({ target: { value } }) => {
     this.setState({
-      speedIndex: Array.from(SPEED_MAP.keys()).indexOf(speedName),
+      speedIndex: Array.from(SPEED_MAP.keys()).indexOf(value),
     });
   };
 
   toggleDisplaySettings = (settingName) => {
-    const newDisplaySettings = Object.assign(this.state.displaySettings, {
+    const newDisplaySettings = Object.assign({}, this.state.displaySettings, {
       [settingName]: !this.state.displaySettings[settingName],
     });
     this.setState({
@@ -223,9 +249,6 @@ class Main extends Component {
     );
   };
 
-  setIsMoving = (bool) => {
-    this.setState({ isMoving: bool });
-  };
   setIsDragging = (bool) => {
     this.setState({ isDragging: bool });
   };
@@ -286,25 +309,35 @@ class Main extends Component {
               fileIndex={this.state.currentFileIndex}
               interval={interval}
               setIsDragging={this.setIsDragging}
-              isDraggable={this.state.totalRandomMoves <= 1}
+              isDraggable={this.state.stats.totalMoves <= 1}
               isResizing={this.state.isResizing}
             />
           )}
-          <Panel
-            makeRandomMoves={this.makeRandomMoves}
-            resetBoard={this.resetBoard}
-            interval={interval}
-            speedNames={Array.from(SPEED_MAP.keys())}
-            speedIndex={this.state.speedIndex}
-            setSpeed={this.setSpeed}
-            displaySettings={this.state.displaySettings}
-            toggleDisplaySettings={this.toggleDisplaySettings}
-            totalFiles={this.state.totalFiles}
-            totalRanks={this.state.totalRanks}
-            changeDimensions={this.changeDimensions}
-            setIsMoving={this.setIsMoving}
-            isMoving={this.state.isMoving}
-          />
+          <div className="panel left">
+            <DisclosureWidget buttonText="Stats for nerds">
+            </DisclosureWidget>
+          </div>
+          <div className="panel right">
+            <Buttons
+              makeRandomMoves={this.makeRandomMoves}
+              resetBoard={this.resetBoard}
+              interval={interval}
+              totalFiles={this.state.totalFiles}
+              totalRanks={this.state.totalRanks}
+            />
+            <DisclosureWidget buttonText="Settings">
+              <Settings
+                speedNames={Array.from(SPEED_MAP.keys())}
+                speedIndex={this.state.speedIndex}
+                setSpeed={this.setSpeed}
+                displaySettings={this.state.displaySettings}
+                toggleDisplaySettings={this.toggleDisplaySettings}
+                initialTotalFiles={this.state.totalFiles}
+                initialTotalRanks={this.state.totalRanks}
+                changeDimensions={this.changeDimensions}
+              />
+            </DisclosureWidget>
+          </div>
         </div>
       </main>
     );

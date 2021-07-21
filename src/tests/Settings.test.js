@@ -4,7 +4,7 @@ import Settings from '../containers/Settings';
 const defaultProps = {
   speedNames: ['Slow', 'Fast'],
   speedIndex: 0,
-  handleSpeed: () => {},
+  setSpeed: () => {},
   displaySettings: {
     showKnight: true,
     showCount: true,
@@ -16,18 +16,7 @@ const defaultProps = {
 };
 
 describe('The Settings component', () => {
-  it('starts in a collapsed state and can be expanded', () => {
-    render(<Settings {...defaultProps} />);
-    const settingsButton = screen.getByRole('button', { name: 'Settings' });
-    expect(screen.getByRole('combobox')).not.toBeVisible();
-    fireEvent.click(settingsButton);
-    expect(screen.getByRole('combobox')).toBeVisible();
-    fireEvent.click(settingsButton);
-    expect(screen.getByRole('combobox')).not.toBeVisible();
-  });
-
   // imperatively changing props; user-directed behaviour tested in Main
-
   it('allows the user to toggle the visibility of the knight', () => {
     const spy = jest.fn();
     const { rerender } = render(<Settings {...defaultProps} toggleDisplaySettings={spy} />);
