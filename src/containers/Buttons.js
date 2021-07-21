@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import Settings from "./Settings";
 
 import { MIN_INTERVAL } from "../constants";
 
@@ -11,40 +10,31 @@ const startTimer = (interval, makeRandomMoves, setIntervalId) => {
   setIntervalId(newIntervalId);
 };
 
-function Panel({
+function Buttons({
   makeRandomMoves,
   resetBoard,
   interval,
-  speedNames,
-  speedIndex,
-  setSpeed,
-  displaySettings,
-  toggleDisplaySettings,
   totalFiles,
   totalRanks,
-  changeDimensions,
-  isMoving,
-  setIsMoving,
 }) {
   const dimsString = `${totalFiles}x${totalRanks}`;
   const [prevDimsString, setPrevDimsString] = useState(dimsString);
   const [intervalId, setIntervalId] = useState(null);
   const [prevInterval, setPrevInterval] = useState(interval);
-
   const resetRef = useRef(null);
   useEffect(() => {
-    if (isMoving) {
+    if (intervalId !== null) {
       if (interval !== prevInterval) {
         window.clearInterval(intervalId);
         startTimer(interval, makeRandomMoves, setIntervalId);
-        setPrevInterval(interval);
       }
       if (dimsString !== prevDimsString) {
         window.clearInterval(intervalId);
-        setPrevDimsString(dimsString);
-        setIsMoving(false);
+        setIntervalId(null);
       }
     }
+    setPrevInterval(interval);
+    setPrevDimsString(dimsString);
 
     return () => {
       if (intervalId) window.clearInterval(intervalId);
@@ -52,63 +42,53 @@ function Panel({
   }, [
     intervalId,
     interval,
-    isMoving,
     prevInterval,
     makeRandomMoves,
     prevDimsString,
     dimsString,
-    setIsMoving
   ]);
 
   const handleStart = () => {
     startTimer(interval, makeRandomMoves, setIntervalId);
-    setIsMoving(true);
   };
   const handleStop = () => {
     window.clearInterval(intervalId);
-    setIsMoving(false);
     setIntervalId(null);
   };
   const handleReset = () => {
-    if (isMoving) handleStop();
+    if (intervalId !== null) handleStop();
     resetBoard();
     resetRef.current.blur();
   };
-  const handleSpeed = ({ target: { value } }) => {
-    const isAlreadyMoving = isMoving;
-    if (isAlreadyMoving) handleStop();
-    setSpeed(value);
-    if (isAlreadyMoving) handleStart();
-  };
 
   return (
-    <div className="panel">
+    <>
       <button
-        disabled={isMoving}
-        className="button"
+        disabled={intervalId !== null}
+        className="panel-button"
         onClick={handleStart}
         type="button"
       >
         Start
       </button>
-      <button disabled={!isMoving} onClick={handleStop} type="button">
+      <button
+        disabled={intervalId === null}
+        className="panel-button"
+        onClick={handleStop}
+        type="button"
+      >
         Stop
       </button>
-      <button ref={resetRef} onClick={handleReset} type="button">
+      <button
+        ref={resetRef}
+        className="panel-button"
+        onClick={handleReset}
+        type="button"
+      >
         Reset
       </button>
-      <Settings
-        speedNames={speedNames}
-        speedIndex={speedIndex}
-        handleSpeed={handleSpeed}
-        displaySettings={displaySettings}
-        toggleDisplaySettings={toggleDisplaySettings}
-        initialTotalFiles={totalFiles}
-        initialTotalRanks={totalRanks}
-        changeDimensions={changeDimensions}
-      />
-    </div>
+    </>
   );
 }
 
-export default Panel;
+export default Buttons;

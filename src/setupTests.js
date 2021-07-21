@@ -23,3 +23,15 @@ global.resizeObserverMethods = {
 }
 
 global.ResizeObserver = MockResizeObserver;
+
+
+Object.assign(
+  global.navigator,
+  {
+    clipboard: {
+      writeText: jest.fn()
+    }
+  })
+global.navigator = {
+
+};
