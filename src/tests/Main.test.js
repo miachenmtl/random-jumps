@@ -1,7 +1,15 @@
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import {
+  render,
+  screen,
+  act,
+  fireEvent,
+  within,
+  waitFor,
+} from "@testing-library/react";
 
 import Main from "../containers/Main";
 import { SPEED_MAP } from "../constants";
+import * as boardUtils from "../utils/boardUtils";
 
 const speedNames = Array.from(SPEED_MAP.keys());
 const intervals = Array.from(SPEED_MAP.values());
@@ -16,10 +24,9 @@ function getTotalCount(element) {
 
 describe("The Main container", () => {
   beforeEach(() => {
-    render(<Main />);
     jest.useFakeTimers();
+    render(<Main />);
   });
-
   afterEach(() => {
     jest.clearAllTimers();
   });
@@ -72,16 +79,17 @@ describe("The Main container", () => {
   it("makes random moves and updates visit counts when the user presses the start button", () => {
     const startButton = screen.getByText("Start");
     expect(startButton).toBeInTheDocument();
+    const board = screen.getByRole("table");
+
     expect(global.setInterval).not.toHaveBeenCalled();
     fireEvent.click(startButton);
     expect(global.setInterval).toHaveBeenCalled();
-    expect(screen.getAllByText("1")).toHaveLength(1);
+    expect(within(board).getAllByText("1")).toHaveLength(1);
 
     jest.advanceTimersByTime(defaultInterval);
-    expect(screen.getAllByText("1")).toHaveLength(2);
+    expect(within(board).getAllByText("1")).toHaveLength(2);
 
     jest.advanceTimersByTime(defaultInterval);
-    const board = screen.getByRole("table");
     const totalCount = getTotalCount(board);
     expect(totalCount).toBe(3);
   });
@@ -101,11 +109,13 @@ describe("The Main container", () => {
 
   it("lets the user change speed while moving", async () => {
     const startButton = screen.getByText("Start");
+    const board = screen.getByRole("table");
+
     fireEvent.click(startButton);
-    expect(screen.getAllByText("1")).toHaveLength(1);
+    expect(within(board).getAllByText("1")).toHaveLength(1);
 
     jest.advanceTimersByTime(defaultInterval);
-    expect(screen.getAllByText("1")).toHaveLength(2);
+    expect(within(board).getAllByText("1")).toHaveLength(2);
     const speedSelect = screen.getByRole("combobox", { name: "Speed" });
     fireEvent.change(speedSelect, { target: { value: speedNames[2] } });
 
@@ -130,16 +140,18 @@ describe("The Main container", () => {
 
   it("resets the visit counts and stops moving when the user presses reset", () => {
     const startButton = screen.getByText("Start");
+    const board = screen.getByRole("table");
+
     fireEvent.click(startButton);
 
     jest.advanceTimersByTime(defaultInterval);
     expect(screen.getAllByText("1")).toHaveLength(2);
     const resetButton = screen.getByText("Reset");
     fireEvent.click(resetButton);
-    expect(screen.getAllByText("1")).toHaveLength(1);
+    expect(within(board).getAllByText("1")).toHaveLength(1);
 
     jest.advanceTimersByTime(2 * defaultInterval);
-    expect(screen.getAllByText("1")).toHaveLength(1);
+    expect(within(board).getAllByText("1")).toHaveLength(1);
   });
 
   it("allows the user to show and hide the knight", async () => {
@@ -153,13 +165,13 @@ describe("The Main container", () => {
   });
 
   it("allows the user to show and hide the count for each square", async () => {
-    const getEmptySquareCount = () =>
-      within(screen.getByRole("table")).getAllByText("0").length;
+    const board = screen.getByRole("table");
+    const getEmptySquareCount = () => within(board).getAllByText("0").length;
     const emptySquareCount = getEmptySquareCount();
     expect(emptySquareCount).toBe(63);
     const showCountCheckbox = screen.getByRole("checkbox", { name: "Count" });
     fireEvent.click(showCountCheckbox);
-    expect(screen.queryByText("0")).toBeNull();
+    expect(within(board).queryByText("0")).toBeNull();
     fireEvent.click(showCountCheckbox);
     expect(emptySquareCount).toBe(63);
   });
@@ -177,7 +189,12 @@ describe("The Main container", () => {
     expect(screen.queryByText("0%")).toBeNull();
   });
 
-  it("correctly shows the percentage of max visits for each square", () => {
+  it("correctly shows the percentage of max visits for each square", async () => {
+    const spy = jest
+      .spyOn(boardUtils, "getLegalMoves")
+      .mockImplementationOnce(() => [[2, 1]])
+      .mockImplementationOnce(() => [[0, 0]]);
+
     const showPercentCheckbox = screen.getByRole("checkbox", {
       name: "% of max",
     });
@@ -185,28 +202,13 @@ describe("The Main container", () => {
     fireEvent.click(startButton);
     fireEvent.click(showPercentCheckbox);
 
-    jest.advanceTimersByTime(2 * defaultInterval);
+    act(()=> {
+      jest.advanceTimersByTime(2 * defaultInterval);
+    });
 
-    // if knight returned to initial square, it will be 100% and 50%
-    // otherwise, there will be three 100%
-
-    const maxPercentCount = screen.getAllByText("100%").length;
-
-    // this is probably a bad idea because of possibility of unreproducibility
-    // due to rng, but mocking the random moves is both unwieldy and non-user-oriented
-    // TODO: if there's a manual mode implememnted, this can be circumvented
-    let isCorrect = false;
-    if (maxPercentCount === 1) {
-      if (screen.getAllByText("50%").length === 1) {
-        isCorrect = true;
-      }
-    }
-    if (maxPercentCount === 3) {
-      if (screen.getAllByText("0%").length === 61) {
-        isCorrect = true;
-      }
-    }
-    expect(isCorrect).toBe(true);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(await screen.findAllByText("100%")).toHaveLength(1);
+    expect(await screen.findAllByText("50%")).toHaveLength(1);
   });
 
   it("allows the user to turn heatmap mode on and off for each square", () => {
@@ -344,5 +346,97 @@ describe("The Main container", () => {
     expect(global.clearInterval).toHaveBeenCalled();
     expect(screen.getAllByRole("cell")).toHaveLength(120);
     expect(screen.getAllByRole("row")).toHaveLength(10);
+  });
+
+  it("displays total moves in the stats sidebar", () => {
+    const startButton = screen.getByText("Start");
+    fireEvent.click(startButton);
+
+    jest.advanceTimersByTime(2 * defaultInterval);
+    const leftPanel = screen.getByText("Stats for nerds").parentElement;
+    expect(within(leftPanel).getByLabelText("Total moves:")).toHaveTextContent(
+      "3"
+    );
+  });
+
+  it("displays stats for returning to initial square in the sidebar", () => {
+    jest
+      .spyOn(boardUtils, "getLegalMoves")
+      .mockImplementationOnce(() => [[2, 1]])
+      .mockImplementationOnce(() => [[0, 0]])
+      .mockImplementationOnce(() => [[2, 1]])
+      .mockImplementationOnce(() => [[4, 2]])
+      .mockImplementationOnce(() => [[2, 1]])
+      .mockImplementationOnce(() => [[0, 0]]);
+
+    const startButton = screen.getByText("Start");
+    fireEvent.click(startButton);
+
+    jest.advanceTimersByTime(2 * defaultInterval);
+    const returnStatsEl = document.querySelector(
+      '[data-heading="To initial square"]'
+    );
+    expect(
+      within(returnStatsEl).getByLabelText("Moves per trip:")
+    ).toHaveTextContent("2");
+    expect(
+      within(returnStatsEl).getByLabelText("Completed trips:")
+    ).toHaveTextContent("1");
+    expect(within(returnStatsEl).getByLabelText("Average:")).toHaveTextContent(
+      "2"
+    );
+
+    jest.advanceTimersByTime(4 * defaultInterval);
+    expect(
+      within(returnStatsEl).getByLabelText("Completed trips:")
+    ).toHaveTextContent("2");
+    expect(
+      within(returnStatsEl).getByLabelText("Moves per trip:")
+    ).toHaveTextContent("2, 4");
+    expect(within(returnStatsEl).getByLabelText("Average:")).toHaveTextContent(
+      "3"
+    );
+  });
+
+  it("displays stats for visiting all squares in the sidebar", async () => {
+    // switch to a 3 x 3 board
+    const ranksInput = screen.getByLabelText("Ranks");
+    const filesInput = screen.getByLabelText("Files");
+    fireEvent.change(ranksInput, { target: { value: "3" } });
+    fireEvent.change(filesInput, { target: { value: "3" } });
+    const newBoardButton = screen.getByText("New Board");
+
+    fireEvent.click(newBoardButton);
+    // we'll cheat and use king moves
+    jest
+      .spyOn(boardUtils, "getLegalMoves")
+      .mockImplementationOnce(() => [[0, 1]])
+      .mockImplementationOnce(() => [[0, 2]])
+      .mockImplementationOnce(() => [[1, 2]])
+      .mockImplementationOnce(() => [[2, 2]])
+      .mockImplementationOnce(() => [[2, 1]])
+      .mockImplementationOnce(() => [[1, 1]])
+      .mockImplementationOnce(() => [[1, 0]])
+      .mockImplementationOnce(() => [[2, 0]]);
+
+    await waitFor(() => {
+      expect(screen.getAllByRole("cell")).toHaveLength(9);
+    });
+
+    const startButton = screen.getByText("Start");
+    fireEvent.click(startButton);
+    jest.advanceTimersByTime(8 * defaultInterval);
+    const tourStatsEl = document.querySelector(
+      '[data-heading="To all squares"]'
+    );
+    expect(
+      within(tourStatsEl).getByLabelText("Completed trips:")
+    ).toHaveTextContent("1");
+    expect(
+      within(tourStatsEl).getByLabelText("Moves per trip:")
+    ).toHaveTextContent("8");
+    expect(within(tourStatsEl).getByLabelText("Average:")).toHaveTextContent(
+      "8"
+    );
   });
 });

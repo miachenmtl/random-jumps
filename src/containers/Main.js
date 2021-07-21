@@ -15,8 +15,17 @@ import { getGradientImageData, getHeatmapRGB } from "../utils/imageUtils";
 
 import Buttons from "./Buttons";
 import DisclosureWidget from "../components/DisclosureWidget";
+import Stats from "./Stats";
 import Settings from "./Settings";
 import { SPEED_MAP, CANVAS_WIDTH, MIN_INTERVAL } from "../constants";
+
+const initialStats = {
+  totalMoves: 1,
+  countsForReturn: [],
+  countsForTour: [],
+  currentReturnCount: 0, // 0-based because increment happens before check
+  currentTourCount: 0,
+};
 
 class Main extends Component {
   constructor() {
@@ -44,14 +53,18 @@ class Main extends Component {
       darkSqBg,
     ]);
 
+    const stats = Object.assign({}, initialStats);
+
     this.boardEl = null;
 
     this.state = {
       totalRanks: totalRanks,
       totalFiles: totalFiles,
-      totalRandomMoves: 1,
+      stats: stats,
+      visitedSquareNameSet: new Set(["a1"]),
       maxSquareCount: 1,
       visitCounts: visitCounts,
+      startSquareName: "a1",
       currentRankIndex: 0,
       currentFileIndex: 0,
       squareWidth: 0,
@@ -144,9 +157,28 @@ class Main extends Component {
   };
 
   makeRandomMoves = (totalNewMoves = 1) => {
-    const { currentFileIndex, currentRankIndex, totalRandomMoves } = this.state;
+    const {
+      currentFileIndex,
+      currentRankIndex,
+      startSquareName,
+      visitedSquareNameSet,
+      stats: {
+        totalMoves,
+        countsForReturn,
+        countsForTour,
+        currentReturnCount,
+        currentTourCount,
+      },
+    } = this.state;
     let tempFileIndex = currentFileIndex;
     let tempRankIndex = currentRankIndex;
+    let tempReturnCount = currentReturnCount;
+    let tempTourCount = currentTourCount;
+    let tempVisitedSquareNameSet = new Set(visitedSquareNameSet);
+
+    const newReturnCounts = [];
+    const newTourCounts = [];
+
     const newMoves = [];
     for (let i = 0; i < totalNewMoves; i += 1) {
       const { totalRanks, totalFiles } = this.state;
@@ -217,13 +249,18 @@ class Main extends Component {
       initialFileIndex,
     ];
     const maxSquareCount = 1;
-    const totalRandomMoves = 1;
+    const startSquareName = getSquareName(initialFileIndex, initialRankIndex);
+    const visitedSquareNameSet = new Set([startSquareName]);
+    const stats = Object.assign({}, initialStats);
+
     this.setState({
       visitCounts,
       currentFileIndex,
       currentRankIndex,
       maxSquareCount,
-      totalRandomMoves,
+      startSquareName,
+      visitedSquareNameSet,
+      stats,
     });
   };
 
@@ -315,6 +352,10 @@ class Main extends Component {
           )}
           <div className="panel left">
             <DisclosureWidget buttonText="Stats for nerds">
+              <Stats
+                stats={this.state.stats}
+                visitCounts={this.state.visitCounts}
+              />
             </DisclosureWidget>
           </div>
           <div className="panel right">
