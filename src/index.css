@@ -83,6 +83,22 @@ td.current.dragged {
 
 td.drop-target {
   filter: brightness(1.5);
+  cursor: pointer;
+}
+
+td.drop-target:hover {
+  filter: brightness(1.7);
+}
+
+td.drop-target::after {
+  position: absolute;
+  content: "";
+  left: calc(50% - 16px);
+  top: calc(50% - 16px);
+  width: 0;
+  height: 0;
+  border: 16px solid rgba(0, 15, 150, 0.4);
+  border-radius: 50%;
 }
 
 table tr:nth-child(odd) td:nth-child(odd),
@@ -228,6 +244,8 @@ label.disabled {
 
 input[type="checkbox"],
 input[type="checkbox"] + label,
+input[type="radio"],
+input[type="radio"] + label,
 label.number,
 input[type="number"],
 label.inline {

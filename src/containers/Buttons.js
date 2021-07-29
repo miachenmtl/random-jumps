@@ -16,6 +16,7 @@ function Buttons({
   interval,
   totalFiles,
   totalRanks,
+  isManual,
 }) {
   const dimsString = `${totalFiles}x${totalRanks}`;
   const [prevDimsString, setPrevDimsString] = useState(dimsString);
@@ -23,6 +24,10 @@ function Buttons({
   const [prevInterval, setPrevInterval] = useState(interval);
   const resetRef = useRef(null);
   useEffect(() => {
+    if (isManual && intervalId) {
+      window.clearInterval(intervalId);
+      setIntervalId(null);
+    }
     if (intervalId !== null) {
       if (interval !== prevInterval) {
         window.clearInterval(intervalId);
@@ -46,6 +51,7 @@ function Buttons({
     makeRandomMoves,
     prevDimsString,
     dimsString,
+    isManual,
   ]);
 
   const handleStart = () => {
@@ -64,7 +70,7 @@ function Buttons({
   return (
     <>
       <button
-        disabled={intervalId !== null}
+        disabled={isManual || intervalId !== null}
         className="panel-button"
         onClick={handleStart}
         type="button"
@@ -72,7 +78,7 @@ function Buttons({
         Start
       </button>
       <button
-        disabled={intervalId === null}
+        disabled={isManual || intervalId === null}
         className="panel-button"
         onClick={handleStop}
         type="button"
