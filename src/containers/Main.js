@@ -20,10 +20,10 @@ import Settings from "./Settings";
 import { SPEED_MAP, CANVAS_WIDTH, MIN_INTERVAL } from "../constants";
 
 const initialStats = {
-  totalMoves: 1,
+  totalMoves: 0,
   countsForReturn: [],
   countsForTour: [],
-  currentReturnCount: 0, // 0-based because increment happens before check
+  currentReturnCount: 0,
   currentTourCount: 0,
 };
 
@@ -36,7 +36,6 @@ class Main extends Component {
     const visitCounts = new Array(totalRanks)
       .fill(0)
       .map(() => new Array(totalFiles).fill(0));
-    visitCounts[0][0] = 1;
 
     // fallbacks as a workaround for jsdom not doing css variables:
     // see https://github.com/jsdom/cssstyle/pull/111
@@ -67,6 +66,7 @@ class Main extends Component {
       startSquareName: "a1",
       currentRankIndex: 0,
       currentFileIndex: 0,
+      targetSquareNames: [],
       squareWidth: 0,
       speedIndex: 0,
       displaySettings: {
@@ -77,8 +77,10 @@ class Main extends Component {
         showHighlight: true,
       },
       gradientImageData: gradientImageData,
+      isManual: false,
       isResizing: false,
       isDragging: false,
+      isClicked: false,
       timeoutId: null,
     };
   }
@@ -180,6 +182,7 @@ class Main extends Component {
     const newTourCounts = [];
 
     const newMoves = [];
+    // TODO: DRY out the stat update logic
     for (let i = 0; i < totalNewMoves; i += 1) {
       const { totalRanks, totalFiles } = this.state;
       const possibleMoves = getLegalMoves(
@@ -222,6 +225,52 @@ class Main extends Component {
       visitedSquareNameSet: tempVisitedSquareNameSet,
     });
   };
+  makeManualMove = (squareName) => {
+    const {
+      totalFiles,
+      totalRanks,
+      startSquareName,
+      visitedSquareNameSet,
+      stats: {
+        totalMoves,
+        countsForReturn,
+        countsForTour,
+        currentReturnCount,
+        currentTourCount,
+      },
+    } = this.state;
+    let newReturnCount = currentReturnCount + 1;
+    const newReturnCounts = countsForReturn.slice(0);
+    if (squareName === startSquareName) {
+      newReturnCounts.push(newReturnCount);
+      newReturnCount = 0;
+    }
+    let newTourCount = currentTourCount + 1;
+    const newTourCounts = countsForTour.slice(0);
+    let newVisitedSquareNameSet = new Set(visitedSquareNameSet);
+    newVisitedSquareNameSet.add(squareName);
+    if (newVisitedSquareNameSet.size === totalFiles * totalRanks) {
+      newTourCounts.push(newTourCount);
+      newTourCount = 0;
+      newVisitedSquareNameSet = new Set([squareName]);
+    }
+    const { fileIndex, rankIndex } = parseSquareName(squareName);
+
+    this.moveKnight([[fileIndex, rankIndex]]);
+    this.setClickedSquare(fileIndex, this.reverseRankIndex(rankIndex));
+    const newStats = {
+      totalMoves: totalMoves + 1,
+      countsForReturn: countsForReturn.concat(newReturnCounts),
+      countsForTour: countsForTour.concat(newTourCounts),
+      currentReturnCount: newReturnCount,
+      currentTourCount: newTourCount,
+    };
+
+    this.setState({
+      stats: newStats,
+      visitedSquareNameSet: newVisitedSquareNameSet,
+    });
+  };
 
   setSpeed = ({ target: { value } }) => {
     this.setState({
@@ -239,11 +288,13 @@ class Main extends Component {
   };
 
   resetBoard = (initialRankIndex = 0, initialFileIndex = 0) => {
+    if (this.state.isClicked) {
+      this.unsetClickedSquare();
+    }
     const visitCounts = new Array(this.state.totalRanks)
       .fill(0)
       .map(() => new Array(this.state.totalFiles).fill(0));
 
-    visitCounts[initialRankIndex][initialFileIndex] = 1;
     const [currentRankIndex, currentFileIndex] = [
       initialRankIndex,
       initialFileIndex,
@@ -293,6 +344,37 @@ class Main extends Component {
     const { fileIndex, rankIndex } = parseSquareName(squareName);
     this.resetBoard(rankIndex, fileIndex);
   };
+  setMode = ({ target: { value } }) => {
+    if (value === "auto") {
+      this.setState({
+        isManual: false,
+        isClicked: false,
+        targetSquareNames: [],
+      });
+    } else if (value === "manual") {
+      this.setState({ isManual: true });
+    } else throw new Error(`Unrecognized value '${value}' in setMode.`);
+  };
+  setClickedSquare = (fileIndex, visualRankIndex) => {
+    const logicalRankIndex = this.reverseRankIndex(visualRankIndex);
+    const legalMoves = getLegalMoves(
+      fileIndex,
+      logicalRankIndex,
+      this.state.totalFiles,
+      this.state.totalRanks
+    );
+    const targetSquareNames = legalMoves.map((move) => getSquareName(...move));
+    this.setState({
+      isClicked: true,
+      targetSquareNames: targetSquareNames,
+    });
+  };
+  unsetClickedSquare = () => {
+    this.setState({
+      isClicked: false,
+      targetSquareNames: [],
+    });
+  };
 
   render() {
     const interval = Array.from(SPEED_MAP.values())[this.state.speedIndex];
@@ -325,12 +407,18 @@ class Main extends Component {
                         squareName={getFileName(logicalFileIndex) + rankName}
                         getHeatmapHexString={this.getHeatmapHexString}
                         setDropSquare={this.setDropSquare}
+                        makeManualMove={this.makeManualMove}
+                        unsetClickedSquare={this.unsetClickedSquare}
                         displaySettings={this.state.displaySettings}
                         isCurrent={
                           isCurrentRank &&
                           logicalFileIndex === this.state.currentFileIndex
                         }
                         isDragging={this.state.isDragging}
+                        isTarget={this.state.targetSquareNames.includes(
+                          getSquareName(logicalFileIndex, logicalRankIndex)
+                        )}
+                        isManual={this.state.isManual}
                       />
                     ))}
                   </Rank>
@@ -346,8 +434,14 @@ class Main extends Component {
               fileIndex={this.state.currentFileIndex}
               interval={interval}
               setIsDragging={this.setIsDragging}
-              isDraggable={this.state.stats.totalMoves <= 1}
+              setClickedSquare={this.setClickedSquare}
+              unsetClickedSquare={this.unsetClickedSquare}
+              isDraggable={
+                this.state.stats.totalMoves === 0 || this.state.isManual
+              }
               isResizing={this.state.isResizing}
+              isManual={this.state.isManual}
+              isClicked={this.state.isClicked}
             />
           )}
           <div className="panel left">
@@ -365,6 +459,7 @@ class Main extends Component {
               interval={interval}
               totalFiles={this.state.totalFiles}
               totalRanks={this.state.totalRanks}
+              isManual={this.state.isManual}
             />
             <DisclosureWidget buttonText="Settings">
               <Settings
@@ -376,6 +471,8 @@ class Main extends Component {
                 initialTotalFiles={this.state.totalFiles}
                 initialTotalRanks={this.state.totalRanks}
                 changeDimensions={this.changeDimensions}
+                isManual={this.state.isManual}
+                setMode={this.setMode}
               />
             </DisclosureWidget>
           </div>

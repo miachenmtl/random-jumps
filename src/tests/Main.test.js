@@ -28,6 +28,7 @@ describe("The Main container", () => {
     render(<Main />);
   });
   afterEach(() => {
+    jest.runOnlyPendingTimers();
     jest.clearAllTimers();
   });
 
@@ -84,14 +85,14 @@ describe("The Main container", () => {
     expect(global.setInterval).not.toHaveBeenCalled();
     fireEvent.click(startButton);
     expect(global.setInterval).toHaveBeenCalled();
+    expect(within(board).queryAllByText("1")).toHaveLength(0);
+
+    jest.advanceTimersByTime(defaultInterval);
     expect(within(board).getAllByText("1")).toHaveLength(1);
 
     jest.advanceTimersByTime(defaultInterval);
-    expect(within(board).getAllByText("1")).toHaveLength(2);
-
-    jest.advanceTimersByTime(defaultInterval);
     const totalCount = getTotalCount(board);
-    expect(totalCount).toBe(3);
+    expect(totalCount).toBe(2);
   });
 
   it("stops moving and updating visit counts when the user presses stop after starting", () => {
@@ -112,15 +113,15 @@ describe("The Main container", () => {
     const board = screen.getByRole("table");
 
     fireEvent.click(startButton);
-    expect(within(board).getAllByText("1")).toHaveLength(1);
+    expect(within(board).queryAllByText("1")).toHaveLength(0);
 
     jest.advanceTimersByTime(defaultInterval);
-    expect(within(board).getAllByText("1")).toHaveLength(2);
+    expect(within(board).getAllByText("1")).toHaveLength(1);
     const speedSelect = screen.getByRole("combobox", { name: "Speed" });
     fireEvent.change(speedSelect, { target: { value: speedNames[2] } });
 
     jest.advanceTimersByTime(defaultInterval);
-    const expectedCalls = 2 + Math.floor(defaultInterval / intervals[2]);
+    const expectedCalls = 1 + Math.floor(defaultInterval / intervals[2]);
     const totalCount = getTotalCount(screen.getByRole("table"));
     expect(totalCount).toBe(expectedCalls);
   });
@@ -133,7 +134,7 @@ describe("The Main container", () => {
     expect(screen.queryByAltText("Knight")).toBeNull();
 
     jest.advanceTimersByTime(defaultInterval);
-    const expectedTotal = defaultInterval / intervals[4] + 1; // the initial total is 1
+    const expectedTotal = defaultInterval / intervals[4];
     const actual = getTotalCount(screen.getByRole("table"));
     expect(actual).toBe(expectedTotal);
   });
@@ -145,13 +146,13 @@ describe("The Main container", () => {
     fireEvent.click(startButton);
 
     jest.advanceTimersByTime(defaultInterval);
-    expect(screen.getAllByText("1")).toHaveLength(2);
+    expect(within(board).getAllByText("1")).toHaveLength(1);
     const resetButton = screen.getByText("Reset");
     fireEvent.click(resetButton);
-    expect(within(board).getAllByText("1")).toHaveLength(1);
+    expect(within(board).queryAllByText("1")).toHaveLength(0);
 
     jest.advanceTimersByTime(2 * defaultInterval);
-    expect(within(board).getAllByText("1")).toHaveLength(1);
+    expect(within(board).queryAllByText("1")).toHaveLength(0);
   });
 
   it("allows the user to show and hide the knight", async () => {
@@ -168,12 +169,12 @@ describe("The Main container", () => {
     const board = screen.getByRole("table");
     const getEmptySquareCount = () => within(board).getAllByText("0").length;
     const emptySquareCount = getEmptySquareCount();
-    expect(emptySquareCount).toBe(63);
+    expect(emptySquareCount).toBe(64);
     const showCountCheckbox = screen.getByRole("checkbox", { name: "Count" });
     fireEvent.click(showCountCheckbox);
     expect(within(board).queryByText("0")).toBeNull();
     fireEvent.click(showCountCheckbox);
-    expect(emptySquareCount).toBe(63);
+    expect(emptySquareCount).toBe(64);
   });
 
   it("allows the user to show and hide the percentage for each square", () => {
@@ -182,33 +183,11 @@ describe("The Main container", () => {
       name: "% of max",
     });
     fireEvent.click(showPercentCheckbox);
-    const expectedCount = 63;
+    const expectedCount = 64;
     const actual = within(screen.getByRole("table")).getAllByText("0%").length;
     expect(actual).toBe(expectedCount);
     fireEvent.click(showPercentCheckbox);
     expect(screen.queryByText("0%")).toBeNull();
-  });
-
-  it("correctly shows the percentage of max visits for each square", async () => {
-    const spy = jest
-      .spyOn(boardUtils, "getLegalMoves")
-      .mockImplementationOnce(() => [[2, 1]])
-      .mockImplementationOnce(() => [[0, 0]]);
-
-    const showPercentCheckbox = screen.getByRole("checkbox", {
-      name: "% of max",
-    });
-    const startButton = screen.getByText("Start");
-    fireEvent.click(startButton);
-    fireEvent.click(showPercentCheckbox);
-
-    act(()=> {
-      jest.advanceTimersByTime(2 * defaultInterval);
-    });
-
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(await screen.findAllByText("100%")).toHaveLength(1);
-    expect(await screen.findAllByText("50%")).toHaveLength(1);
   });
 
   it("allows the user to turn heatmap mode on and off for each square", () => {
@@ -235,7 +214,7 @@ describe("The Main container", () => {
     });
     fireEvent.click(showHeatmapCheckbox);
 
-    const expectedCount = 63;
+    const expectedCount = 64;
     const actualCount = getWhiteSquareCount();
     expect(actualCount).toBe(expectedCount);
 
@@ -288,9 +267,7 @@ describe("The Main container", () => {
 
     fireEvent.drop(dropSquare, mockDragEvent);
     fireEvent.dragEnd(knight);
-    const knightSquare = within(screen.getByRole("table")).getByText(
-      "1"
-    ).parentElement;
+    const knightSquare = document.querySelector(".current");
     expect(knightSquare.getAttribute("title")).toBe("d5");
     expect(document.querySelectorAll(".dragged")).toHaveLength(0);
   });
@@ -301,7 +278,9 @@ describe("The Main container", () => {
     const startButton = screen.getByText("Start");
     fireEvent.click(startButton);
 
-    jest.advanceTimersByTime(defaultInterval);
+    act(() => {
+      jest.advanceTimersByTime(defaultInterval);
+    });
     expect(knight.getAttribute("draggable")).toBe("false");
 
     const stopButton = screen.getByText("Stop");
@@ -355,7 +334,7 @@ describe("The Main container", () => {
     jest.advanceTimersByTime(2 * defaultInterval);
     const leftPanel = screen.getByText("Stats for nerds").parentElement;
     expect(within(leftPanel).getByLabelText("Total moves:")).toHaveTextContent(
-      "3"
+      "2"
     );
   });
 
@@ -440,3 +419,5 @@ describe("The Main container", () => {
     );
   });
 });
+
+export { getTotalCount };

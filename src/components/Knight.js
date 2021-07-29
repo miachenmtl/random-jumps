@@ -17,16 +17,37 @@ function Knight({
   setIsDragging,
   isDraggable,
   isResizing,
+  isManual,
+  isClicked,
+  setClickedSquare,
+  unsetClickedSquare,
 }) {
   const transitionValue = isResizing ? "none" : `all ${interval / 2}ms`;
   const handleDragStart = (event) => {
     event.dataTransfer.setData("text/plain", `${fileIndex},${visualRankIndex}`);
+    event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.dropEffect = "move";
     setIsDragging(true);
+    if (isManual) setClickedSquare(fileIndex, visualRankIndex);
   };
   const handleDragEnd = () => {
     setIsDragging(false);
   };
+  let handleClick;
+  if (isManual) {
+    handleClick = isClicked
+      ? () => {
+          unsetClickedSquare();
+        }
+      : () => {
+          setClickedSquare(fileIndex, visualRankIndex);
+        };
+  }
+
+  let cursor = "default";
+  if (isManual) cursor = "pointer";
+  else if (isDraggable) cursor = "grab";
+
   return (
     <div
       className="piece"
@@ -36,8 +57,10 @@ function Knight({
         left: squareWidth * fileIndex,
         top: squareWidth * visualRankIndex,
         transition: transitionValue,
-        cursor: isDraggable ? "grab" : "default",
+        cursor: cursor,
       }}
+      role="button"
+      onClick={handleClick}
     >
       <img
         draggable={isDraggable}
@@ -48,14 +71,6 @@ function Knight({
         src={knightSvg}
         alt="Knight"
       />
-      {/*
-      <KnightSvg
-        title="knight"
-        viewBox="5 5 35 35"
-        width={0.6 * squareWidth}
-        height={0.6 * squareWidth}
-      />
-      */}
     </div>
   );
 }

@@ -6,8 +6,12 @@ const Square = ({
   squareName,
   getHeatmapHexString,
   setDropSquare,
+  makeManualMove,
+  unsetClickedSquare,
   isCurrent,
   isDragging,
+  isTarget,
+  isManual,
   displaySettings: { showCount, showPercent, showHeatmap, showHighlight },
 }) => {
   const [isDropTarget, setIsDropTarget] = useState(false);
@@ -21,7 +25,9 @@ const Square = ({
   const handleDragOver = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
-    setIsDropTarget(true);
+    if (!isDropTarget && (!isManual || isTarget)) {
+      setIsDropTarget(true);
+    }
   };
   const handleDragLeave = (event) => {
     event.preventDefault();
@@ -30,24 +36,39 @@ const Square = ({
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDropTarget(false);
-    setDropSquare(squareName);
+    if (isManual && isTarget) makeManualMove(squareName);
+    else if (!isManual) setDropSquare(squareName);
   };
+  let handleClick;
+  if (isManual) {
+    if (isTarget) {
+      handleClick = () => {
+        makeManualMove(squareName);
+      };
+    } else {
+      handleClick = () => {
+        unsetClickedSquare();
+      };
+    }
+  }
 
   let tdClass = isCurrent && showHighlight ? "current" : undefined;
   if (tdClass === "current" && isDragging) {
     tdClass += " dragged";
   }
-  if (isDropTarget) {
-    tdClass += " drop-target";
+  if (isDropTarget || isTarget) {
+    tdClass = "drop-target";
   }
 
   return (
     <td
       className={tdClass}
       title={squareName}
+      onDragEnter={handleDragOver}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      onClick={handleClick}
       style={style}
     >
       {showPercent && <span className="percent">{percentText}</span>}
