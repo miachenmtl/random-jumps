@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Settings from "../containers/Settings";
+import LangContext from "../LangContext";
 
 const defaultProps = {
   speedNames: ["Slow", "Fast"],
@@ -21,11 +22,22 @@ const defaultProps = {
   isManual: false,
 };
 
+const mockContext = {
+  lang: "en",
+  setLang: () => {},
+};
+// simplified from https://testing-library.com/docs/example-react-context/
+const renderWithLang = (ui) => {
+  return render(
+    <LangContext.Provider value={mockContext}>{ui}</LangContext.Provider>
+  );
+};
+
 describe("The Settings component", () => {
   // imperatively changing props; user-directed behaviour tested in Main
   it("allows the user to toggle the visibility of the knight", () => {
     const spy = jest.fn();
-    const { rerender } = render(
+    const { rerender } = renderWithLang(
       <Settings {...defaultProps} toggleDisplaySettings={spy} />
     );
     expect(spy).not.toHaveBeenCalled();
@@ -36,14 +48,16 @@ describe("The Settings component", () => {
       showKnight: false,
     });
     rerender(
-      <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      <LangContext.Provider value={mockContext}>
+        <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      </LangContext.Provider>
     );
     expect(screen.getByLabelText("Knight")).not.toBeChecked();
   });
 
   it("allows the user to toggle the visibility of each square count", () => {
     const spy = jest.fn();
-    const { rerender } = render(
+    const { rerender } = renderWithLang(
       <Settings {...defaultProps} toggleDisplaySettings={spy} />
     );
     expect(spy).not.toHaveBeenCalled();
@@ -54,14 +68,16 @@ describe("The Settings component", () => {
       showCount: false,
     });
     rerender(
-      <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      <LangContext.Provider value={mockContext}>
+        <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      </LangContext.Provider>
     );
     expect(screen.getByLabelText("Count")).not.toBeChecked();
   });
 
   it("allows the user to toggle the visibility of the percent of max", () => {
     const spy = jest.fn();
-    const { rerender } = render(
+    const { rerender } = renderWithLang(
       <Settings {...defaultProps} toggleDisplaySettings={spy} />
     );
     expect(spy).not.toHaveBeenCalled();
@@ -72,14 +88,16 @@ describe("The Settings component", () => {
       showPercent: true,
     });
     rerender(
-      <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      <LangContext.Provider value={mockContext}>
+        <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      </LangContext.Provider>
     );
     expect(screen.getByLabelText("% of max")).toBeChecked();
   });
 
   it("allows the user to toggle the visibility of the heatmap", () => {
     const spy = jest.fn();
-    const { rerender } = render(
+    const { rerender } = renderWithLang(
       <Settings {...defaultProps} toggleDisplaySettings={spy} />
     );
     expect(spy).not.toHaveBeenCalled();
@@ -90,14 +108,16 @@ describe("The Settings component", () => {
       showHeatmap: true,
     });
     rerender(
-      <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      <LangContext.Provider value={mockContext}>
+        <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      </LangContext.Provider>
     );
     expect(screen.getByLabelText("Heatmap")).toBeChecked();
   });
 
   it("allows the user to toggle the visibility of highlighted squares", () => {
     const spy = jest.fn();
-    const { rerender } = render(
+    const { rerender } = renderWithLang(
       <Settings {...defaultProps} toggleDisplaySettings={spy} />
     );
     expect(spy).not.toHaveBeenCalled();
@@ -108,25 +128,37 @@ describe("The Settings component", () => {
       showHighlight: false,
     });
     rerender(
-      <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      <LangContext.Provider value={mockContext}>
+        <Settings {...defaultProps} displaySettings={newDisplaySettings} />
+      </LangContext.Provider>
     );
     expect(screen.getByLabelText("Highlight")).not.toBeChecked();
   });
 
   it("toggles between automatic and manual mode", () => {
     const spy = jest.fn();
-    const { rerender } = render(<Settings {...defaultProps} setMode={spy} />);
+    const { rerender } = renderWithLang(
+      <Settings {...defaultProps} setMode={spy} />
+    );
     expect(spy).not.toHaveBeenCalled();
     expect(screen.getByLabelText("Automatic")).toBeChecked();
     expect(screen.getByLabelText("Manual")).not.toBeChecked();
     userEvent.click(screen.getByLabelText("Manual"));
     expect(spy).toHaveBeenCalled();
     expect(spy.mock.calls[0][0].target.value).toBe("manual");
-    rerender(<Settings {...defaultProps} setMode={spy} isManual={true} />);
+    rerender(
+      <LangContext.Provider value={mockContext}>
+        <Settings {...defaultProps} setMode={spy} isManual={true} />
+      </LangContext.Provider>
+    );
     expect(screen.getByLabelText("Automatic")).not.toBeChecked();
     expect(screen.getByLabelText("Manual")).toBeChecked();
     userEvent.click(screen.getByLabelText("Automatic"));
-    rerender(<Settings {...defaultProps} setMode={spy} isManual={false} />);
+    rerender(
+      <LangContext.Provider value={mockContext}>
+        <Settings {...defaultProps} setMode={spy} isManual={false} />
+      </LangContext.Provider>
+    );
     expect(spy.mock.calls[1][0].target.value).toBe("auto");
     expect(screen.getByLabelText("Automatic")).toBeChecked();
     expect(screen.getByLabelText("Manual")).not.toBeChecked();

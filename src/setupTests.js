@@ -2,8 +2,8 @@
 // allows you to do things like:
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom';
-import 'canvas';
+import "@testing-library/jest-dom";
+import "canvas";
 
 const observe = jest.fn();
 const unobserve = jest.fn();
@@ -19,19 +19,16 @@ class MockResizeObserver {
 }
 
 global.resizeObserverMethods = {
-  observe, unobserve, disconnect
-}
+  observe,
+  unobserve,
+  disconnect,
+};
 
 global.ResizeObserver = MockResizeObserver;
 
-
-Object.assign(
-  global.navigator,
-  {
-    clipboard: {
-      writeText: jest.fn()
-    }
-  })
-global.navigator = {
-
-};
+Object.assign(global.navigator, {
+  clipboard: {
+    writeText: jest.fn(),
+  },
+  lang: "en/US",
+});

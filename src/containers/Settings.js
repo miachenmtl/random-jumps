@@ -1,10 +1,28 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 
 import Checkbox from "../components/Checkbox";
 import NumberInput from "../components/NumberInput";
 import { SPEED_MAP, MIN_INTERVAL } from "../constants";
+import strings from "../strings";
+import LangContext from "../LangContext";
 
 const intervals = Array.from(SPEED_MAP.values());
+const {
+  SPEED,
+  SHOW,
+  KNIGHT,
+  COUNT,
+  PERCENT_MAX,
+  HEATMAP,
+  HIGHLIGHT,
+  BOARD,
+  RANKS,
+  FILES,
+  NEW_BOARD,
+  MODE,
+  AUTOMATIC,
+  MANUAL,
+} = strings;
 
 function Settings({
   speedNames,
@@ -24,6 +42,7 @@ function Settings({
   isManual,
   setMode,
 }) {
+  const { lang } = useContext(LangContext);
   const [newTotalFiles, setNewTotalFiles] = useState(initialTotalFiles);
   const [newTotalRanks, setNewTotalRanks] = useState(initialTotalRanks);
 
@@ -39,20 +58,20 @@ function Settings({
 
   return (
     <div>
-      <label htmlFor="speed-select">Speed</label>
+      <label htmlFor="speed-select">{SPEED[lang]}</label>
       <select
         id="speed-select"
-        value={speedNames[speedIndex]}
+        value={speedIndex.toString()}
         onChange={setSpeed}
         multiple={false}
       >
-        {speedNames.map((name, i) => (
-          <option value={name} key={i}>
-            {name}
+        {speedNames.map((nameObj, i) => (
+          <option value={i.toString()} key={i}>
+            {nameObj[lang]}
           </option>
         ))}
       </select>
-      <div className="section" data-heading="Display">
+      <div className="section" data-heading={SHOW[lang]}>
         <Checkbox
           id="show-knight"
           isChecked={showKnight}
@@ -61,7 +80,7 @@ function Settings({
             toggleDisplaySettings("showKnight");
           }}
         >
-          Knight
+          {KNIGHT[lang]}
         </Checkbox>
         <Checkbox
           id="show-count"
@@ -70,7 +89,7 @@ function Settings({
             toggleDisplaySettings("showCount");
           }}
         >
-          Count
+          {COUNT[lang]}
         </Checkbox>
         <Checkbox
           id="show-percent"
@@ -79,7 +98,7 @@ function Settings({
             toggleDisplaySettings("showPercent");
           }}
         >
-          % of max
+          {PERCENT_MAX[lang]}
         </Checkbox>
         <Checkbox
           id="show-heatmap"
@@ -88,7 +107,7 @@ function Settings({
             toggleDisplaySettings("showHeatmap");
           }}
         >
-          Heatmap
+          {HEATMAP[lang]}
         </Checkbox>
         <Checkbox
           id="show-highlight"
@@ -97,32 +116,29 @@ function Settings({
             toggleDisplaySettings("showHighlight");
           }}
         >
-          Highlight
+          {HIGHLIGHT[lang]}
         </Checkbox>
       </div>
-      <div className="section" data-heading="Board">
+      <div className="section" data-heading={BOARD[lang]}>
         <NumberInput
-          label="Ranks"
+          label={RANKS[lang]}
           value={newTotalRanks}
           handleChange={handleRanks}
         />
         <NumberInput
-          label="Files"
+          label={FILES[lang]}
           value={newTotalFiles}
           handleChange={handleFiles}
         />
-        <Checkbox id="infiniteMode" isDisabled={true}>
-          Infinite
-        </Checkbox>
         <button
           type="button"
           className="button button-link"
           onClick={handleUpdate}
         >
-          New Board
+          {NEW_BOARD[lang]}
         </button>
       </div>
-      <section data-heading="Mode">
+      <section className="section" data-heading={MODE[lang]}>
         <div>
           <input
             type="radio"
@@ -132,7 +148,7 @@ function Settings({
             checked={!isManual}
             onChange={setMode}
           />
-          <label htmlFor="auto-mode">Automatic</label>
+          <label htmlFor="auto-mode">{AUTOMATIC[lang]}</label>
         </div>
         <div>
           <input
@@ -143,7 +159,7 @@ function Settings({
             checked={isManual}
             onChange={setMode}
           />
-          <label htmlFor="manual-mode">Manual</label>
+          <label htmlFor="manual-mode">{MANUAL[lang]}</label>
         </div>
       </section>
     </div>

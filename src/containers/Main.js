@@ -18,6 +18,7 @@ import DisclosureWidget from "../components/DisclosureWidget";
 import Stats from "./Stats";
 import Settings from "./Settings";
 import { SPEED_MAP, CANVAS_WIDTH, MIN_INTERVAL } from "../constants";
+import strings from "../strings";
 
 const initialStats = {
   totalMoves: 0,
@@ -26,6 +27,8 @@ const initialStats = {
   currentReturnCount: 0,
   currentTourCount: 0,
 };
+
+const { SETTINGS, STATS } = strings;
 
 class Main extends Component {
   constructor() {
@@ -274,7 +277,7 @@ class Main extends Component {
 
   setSpeed = ({ target: { value } }) => {
     this.setState({
-      speedIndex: Array.from(SPEED_MAP.keys()).indexOf(value),
+      speedIndex: parseInt(value, 10),
     });
   };
 
@@ -445,7 +448,7 @@ class Main extends Component {
             />
           )}
           <div className="panel left">
-            <DisclosureWidget buttonText="Stats for nerds">
+            <DisclosureWidget buttonText={STATS[this.props.lang]}>
               <Stats
                 stats={this.state.stats}
                 visitCounts={this.state.visitCounts}
@@ -461,7 +464,7 @@ class Main extends Component {
               totalRanks={this.state.totalRanks}
               isManual={this.state.isManual}
             />
-            <DisclosureWidget buttonText="Settings">
+            <DisclosureWidget buttonText={SETTINGS[this.props.lang]}>
               <Settings
                 speedNames={Array.from(SPEED_MAP.keys())}
                 speedIndex={this.state.speedIndex}

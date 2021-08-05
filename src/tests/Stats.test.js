@@ -8,6 +8,7 @@ import {
 import { EOL } from "os";
 
 import Stats from "../containers/Stats";
+import LangContext from "../LangContext";
 
 const mockVisitCounts = [
   [1, 2, 4, 5],
@@ -16,10 +17,21 @@ const mockVisitCounts = [
   [1, 4, 6, 4],
 ];
 
+const mockContext = {
+  lang: "en",
+  setLang: () => {},
+};
+// simplified from https://testing-library.com/docs/example-react-context/
+const renderWithLang = (ui) => {
+  return render(
+    <LangContext.Provider value={mockContext}>{ui}</LangContext.Provider>
+  );
+};
+
 describe("The stats container", () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    render(
+    renderWithLang(
       <Stats
         stats={{
           totalMoves: 345,
@@ -39,7 +51,7 @@ describe("The stats container", () => {
 
   it("copies the provided visit counts as a csv to the clipboard", async () => {
     expect(global.navigator.clipboard.writeText).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByText("Copy counts as CSV"));
+    fireEvent.click(screen.getByText("Copy board as CSV"));
     await waitFor(() => {
       expect(screen.getAllByText("Copied!")).toHaveLength(1);
     });
@@ -50,8 +62,8 @@ describe("The stats container", () => {
   });
 
   it("reverts the button text after a second", async () => {
-    fireEvent.click(screen.getByText("Copy counts as CSV"));
-    expect(screen.getByText("Copy counts as CSV")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Copy board as CSV"));
+    expect(screen.getByText("Copy board as CSV")).toBeInTheDocument();
     act(() => {
       jest.advanceTimersByTime(500);
     });
@@ -60,7 +72,42 @@ describe("The stats container", () => {
       jest.advanceTimersByTime(500);
     });
     await waitFor(() => {
-      expect(screen.getAllByText("Copy counts as CSV")).toHaveLength(1);
+      expect(screen.getAllByText("Copy board as CSV")).toHaveLength(1);
+    });
+  });
+
+  it("shows and hides the copy button and message when the mouse moves", () => {
+    expect(document.querySelectorAll(".show")).toHaveLength(0);
+    fireEvent.mouseEnter(document.querySelector(".textarea-wrapper"));
+    expect(document.querySelectorAll(".show")).toHaveLength(2);
+    fireEvent.mouseLeave(document.querySelector(".textarea-wrapper"));
+    expect(document.querySelectorAll(".show")).toHaveLength(0);
+  });
+
+  it("copies the provided return counts as a column to the clipboard", async () => {
+    expect(global.navigator.clipboard.writeText).not.toHaveBeenCalled();
+    fireEvent.click(screen.getAllByText("Copy")[0]);
+    await waitFor(() => {
+      expect(screen.getAllByText("Copied!")).toHaveLength(1);
+    });
+    expect(global.navigator.clipboard.writeText).toHaveBeenCalled();
+    expect(global.navigator.clipboard.writeText).toHaveBeenCalledWith(
+      `2${EOL}54${EOL}34${EOL}`
+    );
+  });
+
+  it("reverts the section button text after a second", async () => {
+    fireEvent.click(screen.getAllByText("Copy")[0]);
+    expect(screen.getAllByText("Copy")[0]).toBeInTheDocument();
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+    expect(await screen.findAllByText("Copied!")).toHaveLength(1);
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+    await waitFor(() => {
+      expect(screen.getAllByText("Copy")).toHaveLength(2);
     });
   });
 });

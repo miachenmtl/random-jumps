@@ -1,80 +1,60 @@
-import { useState, useEffect, useRef } from 'react';
-import { EOL } from 'os';
+import { useState, useContext } from "react";
+import { EOL } from "os";
 
-import StatsSection from '../components/StatsSection';
+import StatsSection from "../components/StatsSection";
+import strings from "../strings";
+import LangContext from "../LangContext";
+import useCopy from "../utils/useCopy";
 
-const BUTTON_TEXT = 'Copy counts as CSV';
-
-const copyToClipboard = async (text, callback) => {
-  await navigator.clipboard.writeText(text);
-  callback();
-}
+const { TO_INITIAL, TO_ALL, TOTAL_MOVES, COPIED, COPY_BOARD } = strings;
 
 function Stats({
   stats: { totalMoves, countsForReturn, countsForTour },
   visitCounts,
 }) {
-  const [hasCopied, setHasCopied] = useState(false);
-  const [buttonText, setButtonText] = useState(BUTTON_TEXT);
-  const timeoutId = useRef(null);
+  const { lang } = useContext(LangContext);
 
-  useEffect(() => {
-    if (hasCopied) {
-      timeoutId.current = window.setTimeout(() => {
-        setButtonText(BUTTON_TEXT);
-        setHasCopied(false);
-      }, 700);
-    }
-    return () => {
-      if (hasCopied) {
-        window.clearTimeout(timeoutId.current);
-      }
-    }
-  }, [hasCopied]);
-  /*  useEffect(() => {
-    setPrevTotalMoves(totalMoves);
-    return () => {
-    if (totalMoves === prevTotalMoves && timeoutId.current !== null) {
-      window.clearTimeout(timeoutId.current);
-    }
-  }}, [totalMoves, prevTotalMoves, setPrevTotalMoves]);
-*/
+  const [buttonText, setButtonText] = useState(COPY_BOARD[lang]);
+
   let visitCountsString = visitCounts
     .slice(0)
     .reverse()
-    .map(
-      (rankCounts) => rankCounts.join(',')
-    )
+    .map((rankCounts) => rankCounts.join(","))
     .join(EOL);
   visitCountsString += EOL;
 
-  const handleCopy = () => {
-    copyToClipboard(
-      visitCountsString,
-      () => {
-        setButtonText('Copied!');
-        setHasCopied(true);
-      }
-    );
-  }
+  const handleCopy = useCopy(
+    () => {
+      setButtonText(COPIED[lang]);
+    },
+    () => {
+      setButtonText(COPY_BOARD[lang]);
+    },
+    lang
+  );
+  const handleClick = () => {
+    handleCopy(visitCountsString);
+  };
 
   return (
     <div>
       <StatsSection
         id="returnsToInitial"
-        heading="To initial square"
+        heading={TO_INITIAL[lang]}
         array={countsForReturn}
       />
-      <StatsSection
-        id="tours"
-        heading="To all squares"
-        array={countsForTour}
-      />
+      <StatsSection id="tours" heading={TO_ALL[lang]} array={countsForTour} />
       <div>
-        <label id="totalMoves" className="inline" htmlFor="totalMoves">Total moves:</label>
+        <label id="totalMoves" className="inline" htmlFor="totalMoves">
+          {TOTAL_MOVES[lang]}
+        </label>
         <span aria-labelledby="totalMoves">{totalMoves.toString()}</span>
       </div>
-      <button type="button" className="button button-link" onClick={handleCopy}>
+      <button
+        type="button"
+        className="button button-link"
+        onClick={handleClick}
+      >
         {buttonText}
       </button>
     </div>
