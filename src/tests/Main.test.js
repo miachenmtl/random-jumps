@@ -10,8 +10,8 @@ import {
 import Main from "../containers/Main";
 import { SPEED_MAP } from "../constants";
 import * as boardUtils from "../utils/boardUtils";
+import LangContext from "../LangContext";
 
-const speedNames = Array.from(SPEED_MAP.keys());
 const intervals = Array.from(SPEED_MAP.values());
 const defaultInterval = intervals[0];
 
@@ -22,10 +22,19 @@ function getTotalCount(element) {
   return total;
 }
 
+const mockContext = {
+  lang: "en",
+  setLang: () => {},
+};
+
 describe("The Main container", () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    render(<Main />);
+    render(
+      <LangContext.Provider value={mockContext}>
+        <Main lang="en" />
+      </LangContext.Provider>
+    );
   });
   afterEach(() => {
     jest.runOnlyPendingTimers();
@@ -118,7 +127,7 @@ describe("The Main container", () => {
     jest.advanceTimersByTime(defaultInterval);
     expect(within(board).getAllByText("1")).toHaveLength(1);
     const speedSelect = screen.getByRole("combobox", { name: "Speed" });
-    fireEvent.change(speedSelect, { target: { value: speedNames[2] } });
+    fireEvent.change(speedSelect, { target: { value: "2" } });
 
     jest.advanceTimersByTime(defaultInterval);
     const expectedCalls = 1 + Math.floor(defaultInterval / intervals[2]);
@@ -129,7 +138,7 @@ describe("The Main container", () => {
   it("hides the knight while moving at warp speed", async () => {
     const startButton = screen.getByText("Start");
     const speedSelect = screen.getByLabelText("Speed");
-    fireEvent.change(speedSelect, { target: { value: speedNames[4] } });
+    fireEvent.change(speedSelect, { target: { value: "4" } });
     fireEvent.click(startButton);
     expect(screen.queryByAltText("Knight")).toBeNull();
 

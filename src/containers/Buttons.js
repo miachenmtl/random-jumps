@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 
+import LangContext from "../LangContext";
+import strings from "../strings";
 import { MIN_INTERVAL } from "../constants";
 
 const startTimer = (interval, makeRandomMoves, setIntervalId) => {
@@ -18,6 +20,9 @@ function Buttons({
   totalRanks,
   isManual,
 }) {
+  const { lang } = useContext(LangContext);
+  const { START, STOP, RESET } = strings;
+
   const dimsString = `${totalFiles}x${totalRanks}`;
   const [prevDimsString, setPrevDimsString] = useState(dimsString);
   const [intervalId, setIntervalId] = useState(null);
@@ -75,7 +80,7 @@ function Buttons({
         onClick={handleStart}
         type="button"
       >
-        Start
+        {START[lang]}
       </button>
       <button
         disabled={isManual || intervalId === null}
@@ -83,7 +88,7 @@ function Buttons({
         onClick={handleStop}
         type="button"
       >
-        Stop
+        {STOP[lang]}
       </button>
       <button
         ref={resetRef}
@@ -91,7 +96,7 @@ function Buttons({
         onClick={handleReset}
         type="button"
       >
-        Reset
+        {RESET[lang]}
       </button>
     </>
   );

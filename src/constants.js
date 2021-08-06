@@ -1,12 +1,16 @@
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
+import strings from "./strings";
+
+const { SPEED_NAMES } = strings;
+
+const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
 const SPEED_MAP = new Map([
-  ['Walk', 600],
-  ['Trot', 300],
-  ['Canter', 200],
-  ['Gallop', 100],
-  ['Jet', 10],
-  ['Warp', 1]
+  [SPEED_NAMES[0], 600],
+  [SPEED_NAMES[1], 300],
+  [SPEED_NAMES[2], 200],
+  [SPEED_NAMES[3], 100],
+  [SPEED_NAMES[4], 10],
+  [SPEED_NAMES[5], 1],
 ]);
 
 const MIN_INTERVAL = 100;
@@ -22,5 +26,5 @@ export {
   MIN_INTERVAL,
   CANVAS_WIDTH,
   MIN_BOARD_LENGTH,
-  MAX_BOARD_LENGTH
+  MAX_BOARD_LENGTH,
 };

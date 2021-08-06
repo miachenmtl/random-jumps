@@ -5,6 +5,7 @@
   --light-square-bg-color: #e0e2db;
   --dark-square-bg-color: #5f7470;
   --board-width: clamp(400px, min(50vw, 80vh), 800px);
+  --panel-width: 220px;
   --total-ranks: 8;
   --total-files: 8;
 }
@@ -27,6 +28,11 @@ code {
 
 .app {
   text-align: center;
+}
+
+.lang-switcher {
+  text-align: right;
+  padding: 12px;
 }
 
 .wrapper {
@@ -122,7 +128,7 @@ div.piece {
 .panel {
   position: absolute;
   top: 0;
-  width: 220px;
+  width: var(--panel-width);
   text-align: center;
 }
 
@@ -143,7 +149,6 @@ div.piece {
   position: relative;
   display: inline-block;
   margin: 0;
-  height: 4rem;
   color: #9b4dca;
   background-color: transparent;
   border: none;
@@ -156,9 +161,12 @@ div.piece {
   text-decoration: none;
   text-transform: uppercase;
   vertical-align: middle;
+  max-width: var(--panel-width);
+  white-space: normal;
 }
 
-.disclosure-toggler:hover, .disclosure-toggler:hover:focus {
+.disclosure-toggler:hover,
+.disclosure-toggler:hover:focus {
   filter: brightness(1.2);
   color: #9b4dca;
   background-color: transparent;
@@ -171,7 +179,8 @@ div.piece {
   border-radius: 2px;
 }
 
-.disclosure-toggler:active, .disclosure-toggler:active:focus {
+.disclosure-toggler:active,
+.disclosure-toggler:active:focus {
   filter: brightness(1.5);
   color: #9b4dca;
   background-color: transparent;
@@ -254,8 +263,9 @@ label.inline {
   font-size: 1.5rem;
 }
 
-label.number {
-  width: 50px;
+.number-input-wrapper {
+  text-align: right;
+  padding-right: 12px;
 }
 
 input[type="number"] {
@@ -284,7 +294,7 @@ a,
   vertical-align: middle;
 }
 
-.button-link {
+.button {
   display: block;
   width: 100%;
 }
@@ -294,8 +304,33 @@ a,
   white-space: normal;
 }
 
-a:hover, a:hover:focus,
-.button-link:hover, .button-link:hover:focus {
+.button-link.lang {
+  display: inline;
+  margin-bottom: 0;
+  color: var(--light-square-bg-color);
+}
+
+.button-link.lang:hover {
+  color: var(--light-square-bg-color);
+  filter: brightness(1.2);
+}
+
+.button-link.lang:active,
+.button-link.lang:active:focus {
+  color: var(--light-square-bg-color);
+  filter: brightness(1.5);
+}
+
+.button-link.lang:focus,
+.button-link.lang:hover:focus {
+  color: var(--light-square-bg-color);
+  filter: brightness(1.4);
+}
+
+a:hover,
+a:hover:focus,
+.button-link:hover,
+.button-link:hover:focus {
   background-color: inherit;
   filter: brightness(1.1);
   border: none;
@@ -311,8 +346,10 @@ a:focus,
   outline: 1px solid rgba(150, 150, 150, 0.4);
 }
 
-a:active, a:active:focus,
-.button-link:active, .button-link:active:focus {
+a:active,
+a:active:focus,
+.button-link:active,
+.button-link:active:focus {
   background-color: inherit;
   border: none;
   color: rgba(19, 29, 207);
@@ -325,8 +362,37 @@ textarea {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
   overflow: scroll;
+  margin-bottom: 0;
 }
 
-textarea.short {
-  height: 4rem;
+.textarea-wrapper {
+  position: relative;
+}
+
+button.copy {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-block;
+  padding: 0 16px;
+  font-size: 1rem;
+  line-height: 1.1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+button.copy.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.copy-msg {
+  margin-bottom: 16px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.copy-msg.show {
+  opacity: 1;
 }

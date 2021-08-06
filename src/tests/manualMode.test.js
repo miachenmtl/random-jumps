@@ -2,16 +2,28 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import Main from "../containers/Main";
+import LangContext from "../LangContext";
 import { SPEED_MAP } from "../constants";
 import { getTotalCount } from "./Main.test";
 
 const intervals = Array.from(SPEED_MAP.values());
 const defaultInterval = intervals[0];
 
+const mockContext = {
+  lang: "en",
+  setLang: () => {},
+};
+// simplified from https://testing-library.com/docs/example-react-context/
+const renderWithLang = (ui) => {
+  return render(
+    <LangContext.Provider value={mockContext}>{ui}</LangContext.Provider>
+  );
+};
+
 describe("The Main component manual mode", () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    render(<Main />);
+    renderWithLang(<Main />);
   });
   afterEach(() => {
     jest.runOnlyPendingTimers();
