@@ -4,6 +4,8 @@ import LangContext from "../LangContext";
 import strings from "../strings";
 import { MIN_INTERVAL } from "../constants";
 
+import style from "./Buttons.module.css";
+
 const startTimer = (interval, makeRandomMoves, setIntervalId) => {
   const totalNewMoves = Math.max(1, MIN_INTERVAL / interval);
   const newIntervalId = window.setInterval(() => {
@@ -76,7 +78,7 @@ function Buttons({
     <>
       <button
         disabled={isManual || intervalId !== null}
-        className="panel-button"
+        className={style.panelButton}
         onClick={handleStart}
         type="button"
       >
@@ -84,7 +86,7 @@ function Buttons({
       </button>
       <button
         disabled={isManual || intervalId === null}
-        className="panel-button"
+        className={style.panelButton}
         onClick={handleStop}
         type="button"
       >
@@ -92,7 +94,7 @@ function Buttons({
       </button>
       <button
         ref={resetRef}
-        className="panel-button"
+        className={style.panelButton}
         onClick={handleReset}
         type="button"
       >

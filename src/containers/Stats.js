@@ -6,6 +6,8 @@ import strings from "../strings";
 import LangContext from "../LangContext";
 import useCopy from "../utils/useCopy";
 
+import style from "./Panels.module.css";
+
 const { TO_INITIAL, TO_ALL, TOTAL_MOVES, COPIED, COPY_BOARD } = strings;
 
 function Stats({
@@ -45,16 +47,12 @@ function Stats({
       />
       <StatsSection id="tours" heading={TO_ALL[lang]} array={countsForTour} />
       <div>
-        <label id="totalMoves" className="inline" htmlFor="totalMoves">
+        <label id="totalMoves" className={style.inline} htmlFor="totalMoves">
           {TOTAL_MOVES[lang]}
         </label>
         <span aria-labelledby="totalMoves">{totalMoves.toString()}</span>
       </div>
-      <button
-        type="button"
-        className="button button-link"
-        onClick={handleClick}
-      >
+      <button type="button" className={style.buttonLink} onClick={handleClick}>
         {buttonText}
       </button>
     </div>

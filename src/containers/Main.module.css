@@ -1,0 +1,20 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 20px auto;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  width: var(--panel-width);
+  text-align: center;
+}
+
+.panel.right {
+  left: calc(100% + 30px);
+}
+
+.panel.left {
+  right: calc(100% + 30px);
+}

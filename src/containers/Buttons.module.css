@@ -1,0 +1,37 @@
+.panelButton {
+  display: block;
+  width: 100%;
+  background-color: #9b4dca;
+  border: 0.1rem solid #9b4dca;
+  border-radius: 0.4rem;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  height: 3.8rem;
+  font-stretch: normal;
+  font-family: "Roboto", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  letter-spacing: 0.1rem;
+  line-height: 2rem;
+  padding: 0 3rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-bottom: 1rem;
+  overflow: visible;
+}
+
+.panelButton[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.panelButton:focus,
+.panelButton:hover,
+.panelButton:hover:focus {
+  background-color: #606c76;
+  border-color: #606c76;
+  color: #fff;
+  outline: 0;
+}

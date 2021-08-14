@@ -1,0 +1,83 @@
+.boardWrapper {
+  display: inline-block;
+  border: 3px solid grey;
+  border-radius: 2px;
+}
+
+.board {
+  width: var(--board-width);
+  height: calc(var(--board-width) * var(--total-ranks) / var(--total-files));
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: 0;
+}
+
+.rank:nth-child(odd) .square:nth-child(odd),
+.rank:nth-child(even) .square:nth-child(even) {
+  background-color: var(--light-square-bg-color);
+}
+
+.rank:nth-child(odd) .square:nth-child(even),
+.rank:nth-child(even) .square:nth-child(odd) {
+  background-color: var(--dark-square-bg-color);
+}
+
+.square {
+  position: relative;
+  font-size: min(1.5em, calc(0.25 * var(--board-width) / var(--total-ranks)));
+  color: black;
+  filter: brightness(1);
+  transition: all 0.2s;
+  border: none;
+  padding: 0;
+}
+
+.current {
+  filter: brightness(1.3);
+  outline: 2px solid grey;
+}
+
+.current.dragged {
+  filter: brightness(0.8);
+}
+
+.dropTarget {
+  filter: brightness(1.5);
+  cursor: pointer;
+}
+
+.dropTarget:hover {
+  filter: brightness(1.7);
+}
+
+.dropTarget::after {
+  position: absolute;
+  content: "";
+  left: calc(50% - 16px);
+  top: calc(50% - 16px);
+  width: 0;
+  height: 0;
+  border: 16px solid rgba(0, 15, 150, 0.4);
+  border-radius: 50%;
+}
+
+.piece {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.8;
+}
+
+.count {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+}
+
+.percent {
+  position: absolute;
+  right: 4px;
+  top: 2px;
+}

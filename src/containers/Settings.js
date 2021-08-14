@@ -6,6 +6,8 @@ import { SPEED_MAP, MIN_INTERVAL } from "../constants";
 import strings from "../strings";
 import LangContext from "../LangContext";
 
+import style from "./Panels.module.css";
+
 const intervals = Array.from(SPEED_MAP.values());
 const {
   SPEED,
@@ -58,9 +60,12 @@ function Settings({
 
   return (
     <div>
-      <label htmlFor="speed-select">{SPEED[lang]}</label>
+      <label className={style.label} htmlFor="speed-select">
+        {SPEED[lang]}
+      </label>
       <select
         id="speed-select"
+        className={style.select}
         value={speedIndex.toString()}
         onChange={setSpeed}
         multiple={false}
@@ -71,7 +76,7 @@ function Settings({
           </option>
         ))}
       </select>
-      <div className="section" data-heading={SHOW[lang]}>
+      <div className={style.section} data-heading={SHOW[lang]}>
         <Checkbox
           id="show-knight"
           isChecked={showKnight}
@@ -119,7 +124,7 @@ function Settings({
           {HIGHLIGHT[lang]}
         </Checkbox>
       </div>
-      <div className="section" data-heading={BOARD[lang]}>
+      <div className={style.section} data-heading={BOARD[lang]}>
         <NumberInput
           label={RANKS[lang]}
           value={newTotalRanks}
@@ -132,34 +137,40 @@ function Settings({
         />
         <button
           type="button"
-          className="button button-link"
+          className={style.buttonLink}
           onClick={handleUpdate}
         >
           {NEW_BOARD[lang]}
         </button>
       </div>
-      <section className="section" data-heading={MODE[lang]}>
+      <section className={style.section} data-heading={MODE[lang]}>
         <div>
           <input
             type="radio"
+            className={style.radio}
             id="auto-mode"
             name="mode-radio"
             value="auto"
             checked={!isManual}
             onChange={setMode}
           />
-          <label htmlFor="auto-mode">{AUTOMATIC[lang]}</label>
+          <label className={style.radio} htmlFor="auto-mode">
+            {AUTOMATIC[lang]}
+          </label>
         </div>
         <div>
           <input
             type="radio"
+            className={style.radio}
             id="manual-mode"
             name="mode-radio"
             value="manual"
             checked={isManual}
             onChange={setMode}
           />
-          <label htmlFor="manual-mode">{MANUAL[lang]}</label>
+          <label className={style.radio} htmlFor="manual-mode">
+            {MANUAL[lang]}
+          </label>
         </div>
       </section>
     </div>

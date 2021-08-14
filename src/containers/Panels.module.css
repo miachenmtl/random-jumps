@@ -1,0 +1,102 @@
+.section {
+  position: relative;
+  margin: 16px 0;
+  border: 1px solid #9b4dca;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.section::after {
+  position: absolute;
+  content: attr(data-heading);
+  left: 10px;
+  height: 2rem;
+  top: -1.3rem;
+  padding: 0 6px;
+  vertical-align: middle;
+  background-color: var(--panel-bg-color);
+}
+
+.label {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+}
+
+.select {
+  -webkit-appearance: none;
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 8" width="30"><path fill="%23d1d1d1" d="M0,0l6,8l6-8"/></svg>')
+    center right no-repeat;
+  padding-right: 3rem;
+  border: 0.1rem solid #d1d1d1;
+  border-radius: 0.4rem;
+  box-shadow: none;
+  box-sizing: border-box;
+  height: 3.8rem;
+  padding-left: 1rem;
+  width: 100%;
+}
+
+.select:focus {
+  border-color: #9b4dca;
+  outline: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 8" width="30"><path fill="%239b4dca" d="M0,0l6,8l6-8"/></svg>');
+}
+
+.buttonLink {
+  white-space: normal;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.3rem;
+  font-family: "Roboto", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  height: revert;
+  padding: 4px;
+  color: rgba(19, 29, 207);
+  filter: brightness(1);
+  text-transform: none;
+  border: none;
+  outline: none;
+  background-color: inherit;
+  text-align: center;
+}
+
+.buttonLink:hover,
+.buttonLink:hover:focus {
+  background-color: inherit;
+  filter: brightness(1.1);
+  border: none;
+  color: rgba(19, 29, 207);
+}
+
+.buttonLink:focus {
+  background-color: inherit;
+  border: none;
+  color: rgba(19, 29, 207);
+  filter: brightness(1);
+  outline: 1px solid rgba(150, 150, 150, 0.4);
+}
+
+.buttonLink:active,
+.buttonLink:active:focus {
+  background-color: inherit;
+  border: none;
+  color: rgba(19, 29, 207);
+  filter: brightness(1.3);
+}
+
+.radio,
+.inline {
+  display: inline-block;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  font-size: 1.5rem;
+  font-weight: 300;
+}

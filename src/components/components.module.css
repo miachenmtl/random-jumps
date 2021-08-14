@@ -1,0 +1,55 @@
+.numberInputWrapper {
+  text-align: right;
+  padding-right: 12px;
+  margin-bottom: 4px;
+}
+
+.numberInput {
+  width: 50px;
+  height: 30px;
+  padding: 0;
+  padding-left: 8px;
+  text-align: center;
+  -webkit-appearance: none;
+  background-color: transparent;
+  border: 0.1rem solid #d1d1d1;
+  border-radius: 0.4rem;
+  box-sizing: border-box;
+}
+
+.numberInput:focus {
+  border-color: #9b4dca;
+  outline: 0;
+}
+
+.langSwitcher {
+  position: relative;
+}
+
+.langButton {
+  composes: buttonLink from "../containers/Panels.module.css";
+  position: absolute;
+  display: inline-block;
+  top: 12px;
+  right: 12px;
+  width: auto;
+  margin-bottom: 0;
+  color: var(--light-square-bg-color);
+}
+
+.langButton:hover {
+  color: var(--light-square-bg-color);
+  filter: brightness(1.2);
+}
+
+.langButton:active,
+.langButton.lang:active:focus {
+  color: var(--light-square-bg-color);
+  filter: brightness(1.5);
+}
+
+.langButton:focus,
+.langButton:hover:focus {
+  color: var(--light-square-bg-color);
+  filter: brightness(1.4);
+}

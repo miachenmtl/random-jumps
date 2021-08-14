@@ -6,6 +6,9 @@ import strings from "../strings";
 import LangContext from "../LangContext";
 import useCopy from "../utils/useCopy";
 
+import panelStyle from "../containers/Panels.module.css";
+import style from "./StatsSection.module.css";
+
 const { TRIP_COUNT, MOVE_COUNTS, AVERAGE, COPY, COPY_MSG, COPIED } = strings;
 
 const sumReducer = (acc, val) => acc + val;
@@ -56,26 +59,35 @@ function StatsSection({ id, heading, array }) {
   let clipboardValue = array.join(EOL);
   clipboardValue += EOL;
 
-  const buttonClass = classNames({ copy: true, show: showCopy });
-  const msgClass = classNames({ "copy-msg": true, show: showCopy });
+  const buttonClass = classNames({
+    [style.copy]: true,
+    [style.show]: showCopy,
+  });
+  const msgClass = classNames({
+    [style.copyMsg]: true,
+    [style.show]: showCopy,
+  });
 
   return (
-    <div className="section" data-heading={heading}>
+    <div className={panelStyle.section} data-heading={heading}>
       <div>
-        <label className="inline" id={countId}>
+        <label className={panelStyle.inline} id={countId}>
           {TRIP_COUNT[lang]}
         </label>
         <span aria-labelledby={countId}>{array.length.toString()}</span>
       </div>
-      <label htmlFor={textareaId}>{MOVE_COUNTS[lang]}</label>
+      <label htmlFor={textareaId} className={panelStyle.label}>
+        {MOVE_COUNTS[lang]}
+      </label>
       <div
-        className="textarea-wrapper"
+        className={style.textareaWrapper}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <textarea
           id={textareaId}
           ref={textareaRef}
+          className={style.statTextarea}
           readOnly
           value={textareaValue}
         />
@@ -91,7 +103,7 @@ function StatsSection({ id, heading, array }) {
       </div>
 
       <div>
-        <label className="inline" id={aveId}>
+        <label className={panelStyle.inline} id={aveId}>
           {AVERAGE[lang]}
         </label>
         <span aria-labelledby={aveId}>{average}</span>

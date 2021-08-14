@@ -5,6 +5,8 @@ import LangContext from "./LangContext";
 import LangSwitcher from "./components/LangSwitcher";
 import strings from "./strings";
 
+import style from "./App.module.css";
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -21,12 +23,15 @@ class App extends Component {
   }
 
   render() {
+    console.log(style);
     return (
       <LangContext.Provider value={this.state}>
-        <div className="app">
-          <header>
+        <div className={style.app}>
+          <header className={style.header}>
             <LangSwitcher />
-            <h1>{strings.TITLE[this.state.lang]}</h1>
+            <h1 className={style.pageTitle}>
+              {strings.TITLE[this.state.lang]}
+            </h1>
           </header>
           <Main lang={this.state.lang} />
         </div>

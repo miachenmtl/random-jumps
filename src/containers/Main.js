@@ -1,4 +1,5 @@
 import { Component } from "react";
+import classNames from "classnames";
 
 import Board from "../components/Board";
 import Rank from "../components/Rank";
@@ -19,6 +20,10 @@ import Stats from "./Stats";
 import Settings from "./Settings";
 import { SPEED_MAP, CANVAS_WIDTH, MIN_INTERVAL } from "../constants";
 import strings from "../strings";
+
+import style from "./Main.module.css";
+
+console.log(style);
 
 const initialStats = {
   totalMoves: 0,
@@ -385,7 +390,7 @@ class Main extends Component {
       this.state.displaySettings.showKnight && interval >= MIN_INTERVAL;
     return (
       <main>
-        <div className="wrapper">
+        <div className={style.wrapper}>
           <Board refCallback={this.boardRefCallback}>
             {this.state.visitCounts
               .slice(0)
@@ -447,7 +452,7 @@ class Main extends Component {
               isClicked={this.state.isClicked}
             />
           )}
-          <div className="panel left">
+          <div className={classNames(style.panel, style.left)}>
             <DisclosureWidget buttonText={STATS[this.props.lang]}>
               <Stats
                 stats={this.state.stats}
@@ -455,7 +460,7 @@ class Main extends Component {
               />
             </DisclosureWidget>
           </div>
-          <div className="panel right">
+          <div className={classNames(style.panel, style.right)}>
             <Buttons
               makeRandomMoves={this.makeRandomMoves}
               resetBoard={this.resetBoard}

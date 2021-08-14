@@ -1,15 +1,16 @@
-function Checkbox({ id, isChecked, isDisabled, children, handleChange }) {
-  const labelClass = isDisabled ? "disabled" : undefined;
+import style from "../containers/Panels.module.css";
+
+function Checkbox({ id, isChecked, children, handleChange }) {
   return (
     <div>
       <input
         type="checkbox"
+        className={style.inline}
         id={id}
         onChange={handleChange}
         checked={isChecked}
-        disabled={isDisabled}
       />
-      <label className={labelClass} htmlFor={id}>
+      <label className={style.inline} htmlFor={id}>
         {children}
       </label>
     </div>
