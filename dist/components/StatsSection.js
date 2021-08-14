@@ -4,6 +4,8 @@ import { EOL } from "os";
 import strings from "../strings";
 import LangContext from "../LangContext";
 import useCopy from "../utils/useCopy";
+import panelStyle from "../containers/Panels.module.css";
+import style from "./StatsSection.module.css";
 const {
   TRIP_COUNT,
   MOVE_COUNTS,
@@ -60,30 +62,32 @@ function StatsSection({
   let clipboardValue = array.join(EOL);
   clipboardValue += EOL;
   const buttonClass = classNames({
-    copy: true,
-    show: showCopy
+    [style.copy]: true,
+    [style.show]: showCopy
   });
   const msgClass = classNames({
-    "copy-msg": true,
-    show: showCopy
+    [style.copyMsg]: true,
+    [style.show]: showCopy
   });
   return /*#__PURE__*/React.createElement("div", {
-    className: "section",
+    className: panelStyle.section,
     "data-heading": heading
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
-    className: "inline",
+    className: panelStyle.inline,
     id: countId
   }, TRIP_COUNT[lang]), /*#__PURE__*/React.createElement("span", {
     "aria-labelledby": countId
   }, array.length.toString())), /*#__PURE__*/React.createElement("label", {
-    htmlFor: textareaId
+    htmlFor: textareaId,
+    className: panelStyle.label
   }, MOVE_COUNTS[lang]), /*#__PURE__*/React.createElement("div", {
-    className: "textarea-wrapper",
+    className: style.textareaWrapper,
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave
   }, /*#__PURE__*/React.createElement("textarea", {
     id: textareaId,
     ref: textareaRef,
+    className: style.statTextarea,
     readOnly: true,
     value: textareaValue
   }), /*#__PURE__*/React.createElement("button", {
@@ -94,7 +98,7 @@ function StatsSection({
   }, buttonText), /*#__PURE__*/React.createElement("div", {
     className: msgClass
   }, COPY_MSG[lang])), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
-    className: "inline",
+    className: panelStyle.inline,
     id: aveId
   }, AVERAGE[lang]), /*#__PURE__*/React.createElement("span", {
     "aria-labelledby": aveId

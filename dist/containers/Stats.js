@@ -4,6 +4,7 @@ import StatsSection from "../components/StatsSection";
 import strings from "../strings";
 import LangContext from "../LangContext";
 import useCopy from "../utils/useCopy";
+import style from "./Panels.module.css";
 const {
   TO_INITIAL,
   TO_ALL,
@@ -46,13 +47,13 @@ function Stats({
     array: countsForTour
   }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     id: "totalMoves",
-    className: "inline",
+    className: style.inline,
     htmlFor: "totalMoves"
   }, TOTAL_MOVES[lang]), /*#__PURE__*/React.createElement("span", {
     "aria-labelledby": "totalMoves"
   }, totalMoves.toString())), /*#__PURE__*/React.createElement("button", {
     type: "button",
-    className: "button button-link",
+    className: style.buttonLink,
     onClick: handleClick
   }, buttonText));
 }

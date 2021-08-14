@@ -1,4 +1,6 @@
 import { useState } from "react";
+import classNames from "classnames";
+import style from "./BoardEls.module.css";
 
 const Square = ({
   visitCount,
@@ -22,7 +24,7 @@ const Square = ({
   const [isDropTarget, setIsDropTarget] = useState(false);
   const ratio = visitCount / maxSquareCount;
   const percentText = `${Math.round(100 * ratio)}%`;
-  const style = showHeatmap ? {
+  const inlineStyle = showHeatmap ? {
     backgroundColor: getHeatmapHexString(ratio)
   } : null;
 
@@ -60,16 +62,12 @@ const Square = ({
     }
   }
 
-  let tdClass = isCurrent && showHighlight ? "current" : undefined;
-
-  if (tdClass === "current" && isDragging) {
-    tdClass += " dragged";
-  }
-
-  if (isDropTarget || isTarget) {
-    tdClass = "drop-target";
-  }
-
+  const tdClass = classNames({
+    [style.square]: true,
+    [style.current]: isCurrent && showHighlight,
+    [style.dragged]: isCurrent && isDragging,
+    [style.dropTarget]: isDropTarget || isTarget
+  });
   return /*#__PURE__*/React.createElement("td", {
     className: tdClass,
     title: squareName,
@@ -78,11 +76,11 @@ const Square = ({
     onDragLeave: handleDragLeave,
     onDrop: handleDrop,
     onClick: handleClick,
-    style: style
+    style: inlineStyle
   }, showPercent && /*#__PURE__*/React.createElement("span", {
-    className: "percent"
+    className: style.percent
   }, percentText), showCount && /*#__PURE__*/React.createElement("span", {
-    className: "count"
+    className: style.count
   }, visitCount));
 };
 

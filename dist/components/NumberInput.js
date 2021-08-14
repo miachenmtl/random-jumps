@@ -1,3 +1,5 @@
+import style from "./components.module.css";
+import panelStyle from "../containers/Panels.module.css";
 import { MIN_BOARD_LENGTH, MAX_BOARD_LENGTH } from "../constants";
 
 function NumberInput({
@@ -6,12 +8,13 @@ function NumberInput({
   handleChange
 }) {
   return /*#__PURE__*/React.createElement("div", {
-    className: "number-input-wrapper"
+    className: style.numberInputWrapper
   }, /*#__PURE__*/React.createElement("label", {
-    className: "number",
+    className: panelStyle.inline,
     htmlFor: `${label}-input`
   }, label), /*#__PURE__*/React.createElement("input", {
     type: "number",
+    className: style.numberInput,
     id: `${label}-input`,
     value: value,
     min: MIN_BOARD_LENGTH,

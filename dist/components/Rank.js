@@ -1,7 +1,9 @@
+import style from "./BoardEls.module.css";
+
 const Rank = ({
-  rankName,
-  isCurrent,
   children
-}) => /*#__PURE__*/React.createElement("tr", null, children);
+}) => /*#__PURE__*/React.createElement("tr", {
+  className: style.rank
+}, children);
 
 export default Rank;

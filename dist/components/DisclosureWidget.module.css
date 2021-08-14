@@ -1,0 +1,81 @@
+.disclosureToggler {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  color: #9b4dca;
+  background-color: transparent;
+  border: none;
+  border-radius: 0.5em;
+  cursor: pointer;
+  height: 3.8rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.1rem;
+  line-height: 3.8rem;
+  padding: 0 3rem;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  vertical-align: middle;
+  max-width: var(--panel-width);
+  white-space: normal;
+}
+
+.disclosureToggler:hover,
+.disclosureToggler:hover:focus {
+  filter: brightness(1.2);
+  color: #9b4dca;
+  background-color: transparent;
+}
+
+.disclosureToggler:focus {
+  color: #9b4dca;
+  background-color: transparent;
+  border: 1px dashed rgba(150, 150, 150, 0.4);
+  border-radius: 2px;
+}
+
+.disclosureToggler:active,
+.disclosureToggler:active:focus {
+  filter: brightness(1.5);
+  color: #9b4dca;
+  background-color: transparent;
+}
+
+/* a css triangle using borders */
+.disclosureToggler::after {
+  position: absolute;
+  content: "";
+  top: calc(50% - 6px);
+  right: 1rem;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-left-color: #9b4dca;
+  transform-origin: 3px center;
+  transform: rotate(0);
+  transition: all 0.2s ease-out;
+}
+
+.disclosureToggler.open::after {
+  transform: rotate(90deg);
+}
+
+.disclosureContent {
+  position: relative;
+  color: var(--page-bg-color);
+  background-color: var(--panel-bg-color);
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid gray;
+  padding: 12px;
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in;
+}
+
+.disclosureContent.open {
+  pointer-events: auto;
+  opacity: 1;
+}

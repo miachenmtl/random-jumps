@@ -4,6 +4,7 @@ import NumberInput from "../components/NumberInput";
 import { SPEED_MAP, MIN_INTERVAL } from "../constants";
 import strings from "../strings";
 import LangContext from "../LangContext";
+import style from "./Panels.module.css";
 const intervals = Array.from(SPEED_MAP.values());
 const {
   SPEED,
@@ -67,9 +68,11 @@ function Settings({
   };
 
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: style.label,
     htmlFor: "speed-select"
   }, SPEED[lang]), /*#__PURE__*/React.createElement("select", {
     id: "speed-select",
+    className: style.select,
     value: speedIndex.toString(),
     onChange: setSpeed,
     multiple: false
@@ -77,7 +80,7 @@ function Settings({
     value: i.toString(),
     key: i
   }, nameObj[lang]))), /*#__PURE__*/React.createElement("div", {
-    className: "section",
+    className: style.section,
     "data-heading": SHOW[lang]
   }, /*#__PURE__*/React.createElement(Checkbox, {
     id: "show-knight",
@@ -111,7 +114,7 @@ function Settings({
       toggleDisplaySettings("showHighlight");
     }
   }, HIGHLIGHT[lang])), /*#__PURE__*/React.createElement("div", {
-    className: "section",
+    className: style.section,
     "data-heading": BOARD[lang]
   }, /*#__PURE__*/React.createElement(NumberInput, {
     label: RANKS[lang],
@@ -123,28 +126,32 @@ function Settings({
     handleChange: handleFiles
   }), /*#__PURE__*/React.createElement("button", {
     type: "button",
-    className: "button button-link",
+    className: style.buttonLink,
     onClick: handleUpdate
   }, NEW_BOARD[lang])), /*#__PURE__*/React.createElement("section", {
-    className: "section",
+    className: style.section,
     "data-heading": MODE[lang]
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
     type: "radio",
+    className: style.radio,
     id: "auto-mode",
     name: "mode-radio",
     value: "auto",
     checked: !isManual,
     onChange: setMode
   }), /*#__PURE__*/React.createElement("label", {
+    className: style.radio,
     htmlFor: "auto-mode"
   }, AUTOMATIC[lang])), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
     type: "radio",
+    className: style.radio,
     id: "manual-mode",
     name: "mode-radio",
     value: "manual",
     checked: isManual,
     onChange: setMode
   }), /*#__PURE__*/React.createElement("label", {
+    className: style.radio,
     htmlFor: "manual-mode"
   }, MANUAL[lang]))));
 }

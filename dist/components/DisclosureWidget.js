@@ -1,4 +1,6 @@
 import { useState, cloneElement } from "react";
+import classNames from "classnames";
+import style from "./DisclosureWidget.module.css";
 
 function DisclosureWidget({
   buttonText,
@@ -6,14 +8,14 @@ function DisclosureWidget({
   ...restProps
 }) {
   const [expanded, setExpanded] = useState(false);
-  let togglerClass = "disclosure-toggler";
-  let contentClass = "disclosure-content";
-
-  if (expanded) {
-    togglerClass += " open";
-    contentClass += " open";
-  }
-
+  const togglerClass = classNames({
+    [style.disclosureToggler]: true,
+    [style.open]: expanded
+  });
+  const contentClass = classNames({
+    [style.disclosureContent]: true,
+    [style.open]: expanded
+  });
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("button", {
     className: togglerClass,
     onClick: () => {

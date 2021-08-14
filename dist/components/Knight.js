@@ -1,5 +1,6 @@
 // import { ReactComponent as KnightSvg } from '../assets/Chess_ndt45.svg';
-import knightSvg from "../assets/Chess_ndt45.svg"; // svg from WikiCommons, importing for img element to add alt text
+import knightSvg from "../assets/Chess_ndt45.svg";
+import style from "./BoardEls.module.css"; // svg from WikiCommons, importing for img element to add alt text
 
 /*
   By en:User:Cburnett - Own work
@@ -48,7 +49,7 @@ function Knight({
   let cursor = "default";
   if (isManual) cursor = "pointer";else if (isDraggable) cursor = "grab";
   return /*#__PURE__*/React.createElement("div", {
-    className: "piece",
+    className: style.piece,
     style: {
       width: squareWidth,
       height: squareWidth,

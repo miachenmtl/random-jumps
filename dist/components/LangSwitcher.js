@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import LangContext from "../LangContext";
 import strings from "../strings";
+import style from "./components.module.css";
 
 function LangSwitcher() {
   const {
@@ -11,15 +12,13 @@ function LangSwitcher() {
     OTHER_LANG,
     OTHER_LANG_CODE
   } = strings;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "lang-switcher"
-  }, /*#__PURE__*/React.createElement("button", {
+  return /*#__PURE__*/React.createElement("button", {
     type: "button",
-    className: "button-link lang",
+    className: style.langButton,
     onClick: () => {
       setLang(OTHER_LANG_CODE[lang]);
     }
-  }, OTHER_LANG[lang]));
+  }, OTHER_LANG[lang]);
 }
 
 export default LangSwitcher;

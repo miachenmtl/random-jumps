@@ -83,12 +83,12 @@ const strings = {
     fr: "Échiquier"
   },
   RANKS: {
-    en: "Ranks",
-    fr: "Rangées"
+    en: "Ranks:",
+    fr: "Rangées:"
   },
   FILES: {
-    en: "Files",
-    fr: "Colonnes"
+    en: "Files:",
+    fr: "Colonnes:"
   },
   NEW_BOARD: {
     en: "New Board",

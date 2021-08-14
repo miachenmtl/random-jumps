@@ -1,4 +1,5 @@
 import { Component } from "react";
+import classNames from "classnames";
 import Board from "../components/Board";
 import Rank from "../components/Rank";
 import Square from "../components/Square";
@@ -11,6 +12,8 @@ import Stats from "./Stats";
 import Settings from "./Settings";
 import { SPEED_MAP, CANVAS_WIDTH, MIN_INTERVAL } from "../constants";
 import strings from "../strings";
+import style from "./Main.module.css";
+console.log(style);
 const initialStats = {
   totalMoves: 0,
   countsForReturn: [],
@@ -348,7 +351,7 @@ class Main extends Component {
     const interval = Array.from(SPEED_MAP.values())[this.state.speedIndex];
     const displayKnight = this.state.displaySettings.showKnight && interval >= MIN_INTERVAL;
     return /*#__PURE__*/React.createElement("main", null, /*#__PURE__*/React.createElement("div", {
-      className: "wrapper"
+      className: style.wrapper
     }, /*#__PURE__*/React.createElement(Board, {
       refCallback: this.boardRefCallback
     }, this.state.visitCounts.slice(0).reverse().map((rankVisits, visualRankIndex) => {
@@ -387,14 +390,14 @@ class Main extends Component {
       isManual: this.state.isManual,
       isClicked: this.state.isClicked
     }), /*#__PURE__*/React.createElement("div", {
-      className: "panel left"
+      className: classNames(style.panel, style.left)
     }, /*#__PURE__*/React.createElement(DisclosureWidget, {
       buttonText: STATS[this.props.lang]
     }, /*#__PURE__*/React.createElement(Stats, {
       stats: this.state.stats,
       visitCounts: this.state.visitCounts
     }))), /*#__PURE__*/React.createElement("div", {
-      className: "panel right"
+      className: classNames(style.panel, style.right)
     }, /*#__PURE__*/React.createElement(Buttons, {
       makeRandomMoves: this.makeRandomMoves,
       resetBoard: this.resetBoard,

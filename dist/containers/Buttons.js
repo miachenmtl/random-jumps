@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import LangContext from "../LangContext";
 import strings from "../strings";
 import { MIN_INTERVAL } from "../constants";
+import style from "./Buttons.module.css";
 
 const startTimer = (interval, makeRandomMoves, setIntervalId) => {
   const totalNewMoves = Math.max(1, MIN_INTERVAL / interval);
@@ -74,17 +75,17 @@ function Buttons({
 
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
     disabled: isManual || intervalId !== null,
-    className: "panel-button",
+    className: style.panelButton,
     onClick: handleStart,
     type: "button"
   }, START[lang]), /*#__PURE__*/React.createElement("button", {
     disabled: isManual || intervalId === null,
-    className: "panel-button",
+    className: style.panelButton,
     onClick: handleStop,
     type: "button"
   }, STOP[lang]), /*#__PURE__*/React.createElement("button", {
     ref: resetRef,
-    className: "panel-button",
+    className: style.panelButton,
     onClick: handleReset,
     type: "button"
   }, RESET[lang]));

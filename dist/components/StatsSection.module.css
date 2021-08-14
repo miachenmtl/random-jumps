@@ -1,0 +1,56 @@
+.statTextarea {
+  resize: none;
+  height: 10rem;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+  overflow: scroll;
+  width: 100%;
+  margin-bottom: 0;
+  background-color: transparent;
+  border: 0.1rem solid #d1d1d1;
+  border-radius: 0.4rem;
+  box-shadow: none;
+  box-sizing: border-box;
+  height: 6.5rem;
+  padding: 4px;
+}
+
+.textareaWrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: content-box;
+}
+
+.copy {
+  composes: panelButton from "../containers/Buttons.module.css";
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0.8;
+  display: inline-block;
+  padding: 0 16px;
+  font-size: 1rem;
+  line-height: 1.1rem;
+  width: auto;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  box-sizing: content-box;
+}
+
+.copy.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.copyMsg {
+  margin-bottom: 16px;
+  font-size: 1rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.copyMsg.show {
+  opacity: 1;
+}

@@ -1,19 +1,19 @@
+import style from "../containers/Panels.module.css";
+
 function Checkbox({
   id,
   isChecked,
-  isDisabled,
   children,
   handleChange
 }) {
-  const labelClass = isDisabled ? "disabled" : undefined;
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
+    className: style.inline,
     id: id,
     onChange: handleChange,
-    checked: isChecked,
-    disabled: isDisabled
+    checked: isChecked
   }), /*#__PURE__*/React.createElement("label", {
-    className: labelClass,
+    className: style.inline,
     htmlFor: id
   }, children));
 }
