@@ -55,27 +55,33 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
   margin: 0;
+  display: table; /* milligram sets to block on small screens */
 }
 
 td {
   position: relative;
-  font-size: min(1.5em, calc(0.25 * var(--board-width) / var(--total-ranks)));
+  font-size: min(1.5em, calc(0.25 * var(--board-width) / var(--total-files)));
   color: black;
   filter: brightness(1);
   transition: all 0.2s;
   border: none;
+  padding: 0;
 }
 
 td span.count {
   position: absolute;
-  right: 4px;
-  bottom: 2px;
+  right: 0;
+  bottom: 0;
+  padding-right: 4px;
+  padding-bottom: 2px;
 }
 
 td span.percent {
   position: absolute;
-  right: 4px;
-  top: 2px;
+  right: 0;
+  top: 0;
+  padding-right: 4px;
+  padding-top: 2px;
 }
 
 td.current {
@@ -140,6 +146,25 @@ div.piece {
   right: calc(100% + 30px);
 }
 
+@media (max-width: 800px) {
+  .panel {
+    text-align: left;
+  }
+
+  .panel.left {
+    left: 0;
+    right: auto;
+    top: 100%;
+    width: 190px;
+  }
+  .panel.right {
+    left: auto;
+    right: 0;
+    top: 100%;
+    width: 190px;
+  }
+}
+
 .panel-button {
   display: block;
   width: 100%;
@@ -163,6 +188,12 @@ div.piece {
   vertical-align: middle;
   max-width: var(--panel-width);
   white-space: normal;
+}
+
+@media (max-width: 800px) {
+  .disclosure-toggler {
+    font-size: 1rem;
+  }
 }
 
 .disclosure-toggler:hover,
