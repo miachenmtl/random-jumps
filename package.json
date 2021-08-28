@@ -19,7 +19,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:cov": "npm test -- --coverage --watchAll && jest-coverage-badges",
+    "test:cov": "npm test -- --coverage --watchAll && jest-coverage-badges -- --output './badges'",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"

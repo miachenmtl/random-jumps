@@ -2,18 +2,18 @@
 
 Mini webapp using React to animate a knight's random walk on a chessboard.
 
-![Coverage lines](https://miachenmtl.github.io/random-jumps/coverage/badge-lines.svg)
-![Coverage functions](https://miachenmtl.github.io/random-jumps/coverage/badge-functions.svg)
-![Coverage branches](https://miachenmtl.github.io/random-jumps/coverage/badge-branches.svg)
-![Coverage statements](https://miachenmtl.github.io/random-jumps/coverage/badge-statements.svg)
+![Coverage lines](badges/badge-lines.svg)
+![Coverage functions](badges/badge-functions.svg)
+![Coverage branches](badges/badge-branches.svg)
+![Coverage statements](badges/badge-statements.svg)
 
 [Demo](https://miachenmtl.github.io/random-jumps)
 
 ## Background
 
-If a knight starts in the corner of an empty chessboard, and makes random moves, how long will it take on average to return to its starting square? The answer, [according](https://www.reddit.com/r/math/comments/1k0hg4/what_is_the_expected_number_of_moves_a_knight/) [to](https://www.youtube.com/watch?v=63HHmjlh794) [math](https://math.stackexchange.com/questions/1588958/knight-returning-to-corner-on-chessboard-average-number-of-steps), is 168. This number surprised me, since there's a one in six chance that it will take just two moves to return, so I made this program to see for myself.
+If a knight starts in the corner of an empty chessboard and makes random moves, how long will it take on average to return to its starting square? The answer, [according](https://www.reddit.com/r/math/comments/1k0hg4/what_is_the_expected_number_of_moves_a_knight/) [to](https://www.youtube.com/watch?v=63HHmjlh794) [math](https://math.stackexchange.com/questions/1588958/knight-returning-to-corner-on-chessboard-average-number-of-steps), is 168. This number surprised me, since there's a one in six chance that it will take just two moves to return, so I made this program to see for myself.
 
-If you look at the statistics in the app, you'll likely find that the average will indeed settle to around 168, but it will take a long time. This is because there's a relatively large probability the knight's trip will be relatively short, but there's a small chance that the trip will take hundreds of moves, and it takes a while for these long-haul journeys to raise the average to the expected result.
+If you look at the statistics in the app, you'll likely find that the average will start much lower but eventually rise to around 168, but it will take a long time. This is because there's a relatively large probability the knight's trip will be short, but there's a small chance that the trip will take hundreds of moves, and it takes a while for these long-haul journeys to raise the average to the expected result.
 
 I haven't been able to find any answer to the related question of how long it will take on average for the knight to reach all 64 squares, but experimentally, it seems to be around 540.
 
@@ -34,7 +34,7 @@ I haven't been able to find any answer to the related question of how long it wi
 - Responsive design
 - Extensive testing (>95%) using Jest and React Testing Library
 - Strings and constants are separate from components in order to have a single source of truth for both runtime and testing
-- I did most of the CSS by myself, I used [Milligram](https://milligram.io/) as a base.
+- I did most of the CSS by myself, with [Milligram](https://milligram.io/) used as a base.
 - The knight SVG is taken from WikiCommons:
 
 ```
