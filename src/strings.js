@@ -97,6 +97,14 @@ const strings = {
     en: "Files",
     fr: "Colonnes",
   },
+  ROWS: {
+    en: "i.e., rows",
+    fr: "",
+  },
+  COLS: {
+    en: "i.e., columns",
+    fr: "",
+  },
   NEW_BOARD: {
     en: "New Board",
     fr: "Nouvel Échiquier",

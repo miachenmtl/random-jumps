@@ -42,16 +42,20 @@ class Main extends Component {
 
     // fallbacks as a workaround for jsdom not doing css variables:
     // see https://github.com/jsdom/cssstyle/pull/111
+    /*
+    It looks kinda funny using the off-white light square
+    so I'm using pure white instead of this
     const lightSqBg =
       getComputedStyle(document.documentElement).getPropertyValue(
         "--light-square-bg-color"
       ) || "white";
+    */
     const darkSqBg =
       getComputedStyle(document.documentElement).getPropertyValue(
         "--dark-square-bg-color"
       ) || "black";
     const gradientImageData = getGradientImageData(CANVAS_WIDTH, [
-      lightSqBg,
+      "#fff",
       darkSqBg,
     ]);
 
