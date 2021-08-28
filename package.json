@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^12.8.3",
     "classnames": "^2.3.1",
     "gh-pages": "^3.2.3",
+    "jest-coverage-badges": "^1.1.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
@@ -18,6 +19,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:cov": "npm test -- --coverage --watchAll && jest-coverage-badges",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
@@ -29,7 +31,12 @@
   },
   "jest": {
     "resetMocks": false,
-    "clearMocks": true
+    "clearMocks": true,
+    "coverageReporters": [
+      "json-summary", 
+      "text",
+      "lcov"
+    ]
   },
   "browserslist": {
     "production": [

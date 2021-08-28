@@ -29,6 +29,14 @@ class App extends Component {
             <h1>{strings.TITLE[this.state.lang]}</h1>
           </header>
           <Main lang={this.state.lang} />
+          <footer>
+            <a
+              className="light"
+              href="https://github.com/miachenmtl/random-jumps"
+            >
+              Source and ReadMe
+            </a>
+          </footer>
         </div>
       </LangContext.Provider>
     );

@@ -18,6 +18,8 @@ const {
   BOARD,
   RANKS,
   FILES,
+  ROWS,
+  COLS,
   NEW_BOARD,
   MODE,
   AUTOMATIC,
@@ -122,11 +124,13 @@ function Settings({
       <div className="section" data-heading={BOARD[lang]}>
         <NumberInput
           label={RANKS[lang]}
+          title={ROWS[lang]}
           value={newTotalRanks}
           handleChange={handleRanks}
         />
         <NumberInput
           label={FILES[lang]}
+          title={COLS[lang]}
           value={newTotalFiles}
           handleChange={handleFiles}
         />
