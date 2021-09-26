@@ -449,3 +449,10 @@ button.copy.show {
 .copy-msg.show {
   opacity: 1;
 }
+
+footer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  padding: 8px;
+}
