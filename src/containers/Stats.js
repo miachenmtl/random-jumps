@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { EOL } from "os";
 
 import StatsSection from "../components/StatsSection";
@@ -15,6 +15,9 @@ function Stats({
   const { lang } = useContext(LangContext);
 
   const [buttonText, setButtonText] = useState(COPY_BOARD[lang]);
+  useEffect(() => {
+    setButtonText(COPY_BOARD[lang]);
+  }, [lang]);
 
   let visitCountsString = visitCounts
     .slice(0)
